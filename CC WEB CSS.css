@@ -1,0 +1,480 @@
+/* ==========================================
+   CREATORCALC STYLE SHEET
+========================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #0b0f19;
+    color: #ffffff;
+    line-height: 1.6;
+}
+
+body.light-mode {
+    background: #f4f6f8;
+    color: #111827;
+}
+
+button,
+input,
+select {
+    font-family: inherit;
+}
+
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+
+/* HEADER */
+
+.header {
+    background: #111827;
+    border-bottom: 1px solid #263044;
+    padding: 18px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.logo span {
+    color: #00d4ff;
+}
+
+.theme-button {
+    border: none;
+    background: #1f2937;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+
+/* HERO */
+
+.hero {
+    text-align: center;
+    padding: 90px 20px;
+    background: linear-gradient(135deg, #111827, #0b0f19);
+}
+
+.hero h1 {
+    font-size: 45px;
+    max-width: 800px;
+    margin: 0 auto 20px;
+}
+
+.hero p {
+    max-width: 650px;
+    margin: 0 auto 30px;
+    color: #aeb8c9;
+    font-size: 18px;
+}
+
+.start-button {
+    display: inline-block;
+    background: #00d4ff;
+    color: #001018;
+    text-decoration: none;
+    padding: 14px 25px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+
+/* SECTIONS */
+
+section {
+    padding: 70px 0;
+}
+
+.hero {
+    padding: 90px 20px;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.section-title h2 {
+    font-size: 30px;
+    margin-bottom: 8px;
+}
+
+.section-title p {
+    color: #9ca8ba;
+}
+
+
+/* CARDS */
+
+.calculator-card,
+.comparison-card,
+.history-card,
+.faq-card {
+    background: #111827;
+    border: 1px solid #263044;
+    border-radius: 18px;
+    padding: 30px;
+    max-width: 700px;
+    margin: 0 auto;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+}
+
+
+/* FORMS */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid #364154;
+    background: #0b0f19;
+    color: white;
+    font-size: 16px;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #00d4ff;
+}
+
+
+/* BUTTONS */
+
+.calculate-button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: #00d4ff;
+    color: #001018;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.calculate-button:hover {
+    opacity: 0.85;
+}
+
+.secondary-button {
+    padding: 12px 18px;
+    border: 1px solid #364154;
+    border-radius: 9px;
+    background: #1b2433;
+    color: white;
+    cursor: pointer;
+}
+
+.clear-button {
+    margin-top: 20px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    background: #2a3445;
+    color: white;
+    cursor: pointer;
+}
+
+
+/* RESULTS */
+
+.result-card {
+    max-width: 700px;
+    margin: 30px auto 0;
+    padding: 35px;
+    text-align: center;
+    background: #111827;
+    border: 1px solid #00d4ff;
+    border-radius: 18px;
+}
+
+.hidden {
+    display: none;
+}
+
+.main-earning {
+    margin: 25px 0;
+}
+
+.main-earning span {
+    display: block;
+    font-size: 42px;
+    font-weight: bold;
+    color: #00d4ff;
+}
+
+.main-earning small,
+.tsh-earning small {
+    color: #9ca8ba;
+}
+
+.tsh-earning {
+    margin-bottom: 25px;
+}
+
+.tsh-earning span {
+    display: block;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.earning-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.earning-box {
+    background: #0b0f19;
+    padding: 18px;
+    border-radius: 12px;
+}
+
+.earning-box span {
+    display: block;
+    color: #9ca8ba;
+    margin-bottom: 5px;
+}
+
+.earning-box strong {
+    font-size: 18px;
+}
+
+.result-description {
+    margin: 25px 0;
+    color: #aeb8c9;
+}
+
+.result-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+
+/* TABLE */
+
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 25px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 14px;
+    border-bottom: 1px solid #263044;
+    text-align: left;
+}
+
+th {
+    color: #00d4ff;
+}
+
+
+/* HISTORY */
+
+.history-item {
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #263044;
+    border-radius: 10px;
+    background: #0b0f19;
+}
+
+.history-platform {
+    font-weight: bold;
+    color: #00d4ff;
+}
+
+.history-date {
+    color: #8d99aa;
+    font-size: 13px;
+}
+
+.empty-history {
+    text-align: center;
+    color: #8d99aa;
+}
+
+
+/* FAQ */
+
+.faq-card h3 {
+    margin-top: 20px;
+    margin-bottom: 8px;
+}
+
+.faq-card h3:first-child {
+    margin-top: 0;
+}
+
+.faq-card p {
+    color: #aeb8c9;
+}
+
+
+/* FOOTER */
+
+.footer {
+    text-align: center;
+    background: #080c14;
+    color: #ffffff;
+    padding: 50px 20px;
+    margin-top: 50px;
+}
+
+.footer h2 {
+    margin-bottom: 10px;
+}
+
+.disclaimer {
+    max-width: 700px;
+    margin: 20px auto;
+    color: #7f8a9b;
+    font-size: 13px;
+}
+
+.copyright {
+    color: #687386;
+    font-size: 13px;
+}
+
+
+/* LIGHT MODE */
+
+body.light-mode .header,
+body.light-mode .calculator-card,
+body.light-mode .comparison-card,
+body.light-mode .history-card,
+body.light-mode .faq-card,
+body.light-mode .result-card {
+    background: white;
+    border-color: #d9dee7;
+}
+
+body.light-mode .result-card {
+    border-color: #00a8cc;
+}
+
+body.light-mode .hero {
+    background: #ffffff;
+}
+
+body.light-mode .hero p,
+body.light-mode .section-title p,
+body.light-mode .result-description,
+body.light-mode .faq-card p {
+    color: #596579;
+}
+
+body.light-mode .form-group input,
+body.light-mode .form-group select,
+body.light-mode .earning-box,
+body.light-mode .history-item {
+    background: #f4f6f8;
+    color: #111827;
+    border-color: #d9dee7;
+}
+
+body.light-mode .theme-button {
+    background: #e8edf3;
+    color: #111827;
+}
+
+body.light-mode .secondary-button,
+body.light-mode .clear-button {
+    background: #e8edf3;
+    color: #111827;
+    border: 1px solid #d9dee7;
+}
+
+body.light-mode th,
+body.light-mode td {
+    border-bottom-color: #d9dee7;
+}
+
+body.light-mode .main-earning span,
+body.light-mode .logo span,
+body.light-mode th,
+body.light-mode .history-platform {
+    color: #0089a8;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+    .hero h1 {
+        font-size: 32px;
+    }
+
+    .hero p {
+        font-size: 16px;
+    }
+
+    .earning-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .result-buttons {
+        flex-direction: column;
+    }
+
+    .calculator-card,
+    .comparison-card,
+    .history-card,
+    .faq-card,
+    .result-card {
+        padding: 22px;
+    }
+
+    .main-earning span {
+        font-size: 34px;
+    }
+
+}
