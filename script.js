@@ -1,404 +1,530 @@
-/* ==========================================
-   CREATORCALC - CALCULATOR SCRIPT
-========================================== */
-"use strict";
+(() => {
+  "use strict";
 
-/* ---------- SETTINGS ---------- */
+  const $ = (id) => document.getElementById(id);
 
-// Simplified RPM ranges (USD per 1,000 views). Estimates only.
-const rpmRates = {
-    youtube:   { min: 1,    max: 8 },
-    tiktok:    { min: 0.20, max: 1 },
-    instagram: { min: 0.10, max: 1 },
-    facebook:  { min: 0.50, max: 4 },
-    website:   { min: 1,    max: 10 }
-};
+  const USD_TO_TSH = 2600;
 
-const platformNames = {
-    youtube: "YouTube", tiktok: "TikTok", instagram: "Instagram",
-    facebook: "Facebook", website: "Website"
-};
+  const RPM = {
+    youtube:   { low: 1, high: 8 },
+    tiktok:    { low: 0.20, high: 1 },
+    instagram: { low: 0.10, high: 1 },
+    facebook:  { low: 0.50, high: 4 },
+    website:   { low: 1, high: 10 }
+  };
 
-// n = name, c = currency code, m = audience value multiplier
-const countries = {
-    tz: { n: "Tanzania",       c: "TZS", m: 0.55 },
-    ke: { n: "Kenya",          c: "KES", m: 0.65 },
-    ug: { n: "Uganda",         c: "UGX", m: 0.55 },
-    rw: { n: "Rwanda",         c: "RWF", m: 0.55 },
-    et: { n: "Ethiopia",       c: "ETB", m: 0.45 },
-    zm: { n: "Zambia",         c: "ZMW", m: 0.55 },
-    ng: { n: "Nigeria",        c: "NGN", m: 0.65 },
-    gh: { n: "Ghana",          c: "GHS", m: 0.70 },
-    za: { n: "South Africa",   c: "ZAR", m: 0.90 },
-    eg: { n: "Egypt",          c: "EGP", m: 0.55 },
-    in: { n: "India",          c: "INR", m: 0.40 },
-    pk: { n: "Pakistan",       c: "PKR", m: 0.35 },
-    ph: { n: "Philippines",    c: "PHP", m: 0.50 },
-    br: { n: "Brazil",         c: "BRL", m: 0.55 },
-    ae: { n: "United Arab Emirates", c: "AED", m: 0.90 },
-    de: { n: "Germany",        c: "EUR", m: 0.95 },
-    uk: { n: "United Kingdom", c: "GBP", m: 0.95 },
-    ca: { n: "Canada",         c: "CAD", m: 0.95 },
-    au: { n: "Australia",      c: "AUD", m: 0.95 },
-    us: { n: "United States",  c: "USD", m: 1 },
-    other: { n: "Other country", c: "USD", m: 0.75 }
-};
+  const PLATFORM_NAMES = {
+    youtube: "YouTube",
+    tiktok: "TikTok",
+    instagram: "Instagram",
+    facebook: "Facebook",
+    website: "Website / blog"
+  };
 
-const currencyNames = {
-    USD: "US Dollars", TZS: "Tanzanian Shillings", KES: "Kenyan Shillings",
-    UGX: "Ugandan Shillings", RWF: "Rwandan Francs", ETB: "Ethiopian Birr",
-    ZMW: "Zambian Kwacha", NGN: "Nigerian Naira", GHS: "Ghanaian Cedis",
-    ZAR: "South African Rand", EGP: "Egyptian Pounds", INR: "Indian Rupees",
-    PKR: "Pakistani Rupees", PHP: "Philippine Pesos", BRL: "Brazilian Reais",
-    AED: "UAE Dirhams", EUR: "Euros", GBP: "British Pounds",
-    CAD: "Canadian Dollars", AUD: "Australian Dollars"
-};
+  // Approximate number of local currency units per 1 USD.
+  // Update these rates periodically.
+  const CURRENCIES = {
+    "United States": { code: "USD", rate: 1 },
+    "United Kingdom": { code: "GBP", rate: 0.75 },
+    Canada: { code: "CAD", rate: 1.37 },
+    Australia: { code: "AUD", rate: 1.53 },
+    Germany: { code: "EUR", rate: 0.92 },
+    France: { code: "EUR", rate: 0.92 },
+    "South Africa": { code: "ZAR", rate: 18 },
+    Tanzania: { code: "TZS", rate: USD_TO_TSH },
+    Kenya: { code: "KES", rate: 130 },
+    Uganda: { code: "UGX", rate: 3700 },
+    Nigeria: { code: "NGN", rate: 1500 },
+    Ghana: { code: "GHS", rate: 15 },
+    India: { code: "INR", rate: 86 },
+    Pakistan: { code: "PKR", rate: 280 },
+    Philippines: { code: "PHP", rate: 57 },
+    Brazil: { code: "BRL", rate: 5.7 },
+    "United Arab Emirates": { code: "AED", rate: 3.67 },
+    "Saudi Arabia": { code: "SAR", rate: 3.75 },
+    Japan: { code: "JPY", rate: 150 },
+    Singapore: { code: "SGD", rate: 1.35 },
+    Other: { code: "USD", rate: 1 }
+  };
 
-// Approximate fallback rates (units per 1 USD), used if live rates cannot load.
-let rates = {
-    USD: 1, TZS: 2600, KES: 129, UGX: 3650, RWF: 1400, ETB: 135, ZMW: 26,
-    NGN: 1550, GHS: 12, ZAR: 18, EGP: 49, INR: 85, PKR: 280, PHP: 57,
-    BRL: 5.5, AED: 3.67, EUR: 0.92, GBP: 0.78, CAD: 1.38, AUD: 1.52
-};
+  const COUNTRY_MULTIPLIERS = {
+    "United States": 1,
+    "United Kingdom": 0.90,
+    Canada: 0.85,
+    Australia: 0.90,
+    Germany: 0.80,
+    France: 0.70,
+    "South Africa": 0.35,
+    Tanzania: 0.15,
+    Kenya: 0.20,
+    Uganda: 0.15,
+    Nigeria: 0.20,
+    Ghana: 0.20,
+    India: 0.25,
+    Pakistan: 0.15,
+    Philippines: 0.25,
+    Brazil: 0.35,
+    "United Arab Emirates": 0.80,
+    "Saudi Arabia": 0.65,
+    Japan: 0.80,
+    Singapore: 0.90
+  };
 
-const noDecimals = ["TZS", "UGX", "RWF", "ETB", "NGN", "KES", "PKR", "INR", "PHP"];
+  const COUNTRIES = Object.keys(CURRENCIES);
 
-const $ = function (id) { return document.getElementById(id); };
-let lastCalc = null;
-
-/* ---------- SAFE STORAGE ---------- */
-
-function storageGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
-function storageSet(key, value) { try { localStorage.setItem(key, value); } catch (e) { /* ignore */ } }
-function storageRemove(key) { try { localStorage.removeItem(key); } catch (e) { /* ignore */ } }
-
-/* ---------- FORMATTING ---------- */
-
-function toLocal(usd, code) { return usd * (rates[code] || 1); }
-
-function fmtCur(amount, code) {
-    const d = noDecimals.indexOf(code) > -1 ? 0 : 2;
+  function money(amount, currency = "USD") {
     try {
-        return new Intl.NumberFormat("en-US", {
-            style: "currency", currency: code,
-            minimumFractionDigits: d, maximumFractionDigits: d
-        }).format(amount);
-    } catch (e) {
-        return code + " " + Math.round(amount).toLocaleString("en-US");
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency,
+        maximumFractionDigits: 2
+      }).format(Number.isFinite(amount) ? amount : 0);
+    } catch {
+      return `${currency} ${Number(amount || 0).toFixed(2)}`;
     }
-}
-function fmtUSD(amount) { return fmtCur(amount, "USD"); }
-function num(n) { return Math.round(n).toLocaleString("en-US"); }
-function curOf(countryKey) { return countries[countryKey].c; }
+  }
 
-/* ---------- COUNTRY DROPDOWNS ---------- */
+  function number(value) {
+    return new Intl.NumberFormat("en-US", {
+      maximumFractionDigits: 0
+    }).format(Math.max(0, Math.round(value || 0)));
+  }
 
-function fillCountries() {
-    ["country", "goalCountry", "comparisonCountry", "projCountry"].forEach(function (id) {
-        const select = $(id);
-        if (!select) return;
-        Object.keys(countries).forEach(function (key) {
-            const option = document.createElement("option");
-            option.value = key;
-            option.textContent = countries[key].n + (countries[key].c !== "USD" ? " (" + countries[key].c + ")" : "");
-            select.appendChild(option);
-        });
+  function numericValue(id, fallback = 0) {
+    const el = $(id);
+    const value = el ? Number(el.value) : fallback;
+    return Number.isFinite(value) ? Math.max(0, value) : fallback;
+  }
+
+  function selectedCountry(id) {
+    return $(id)?.value || "Tanzania";
+  }
+
+  function selectedPlatform(id) {
+    return $(id)?.value || "youtube";
+  }
+
+  function getCurrency(country) {
+    return CURRENCIES[country] || CURRENCIES.Other;
+  }
+
+  // Display the same amount in USD and the selected country's currency.
+  function dualMoney(usdAmount, country) {
+    const currency = getCurrency(country);
+    const localAmount = usdAmount * currency.rate;
+
+    if (currency.code === "USD") {
+      return money(usdAmount, "USD");
+    }
+
+    return `${money(usdAmount, "USD")} / ${money(localAmount, currency.code)}`;
+  }
+
+  function countryMultiplier(country) {
+    return COUNTRY_MULTIPLIERS[country] ?? 0.30;
+  }
+
+  function estimate(platform, views, country, type = "average") {
+    const range = RPM[platform] || RPM.youtube;
+
+    let rate = (range.low + range.high) / 2;
+
+    if (type === "low") rate = range.low;
+    if (type === "high") rate = range.high;
+
+    return Math.max(0, views) / 1000 *
+      rate * countryMultiplier(country);
+  }
+
+  function fillCountries() {
+    [
+      "country",
+      "goalCountry",
+      "comparisonCountry",
+      "projCountry"
+    ].forEach((id) => {
+      const select = $(id);
+      if (!select) return;
+
+      const previous = select.value;
+      select.replaceChildren();
+
+      COUNTRIES.forEach((country) => {
+        const option = document.createElement("option");
+        option.value = country;
+        option.textContent = country;
+        select.appendChild(option);
+      });
+
+      select.value = COUNTRIES.includes(previous)
+        ? previous
+        : "Tanzania";
     });
-}
+  }
 
-/* ---------- LIVE EXCHANGE RATES ---------- */
+  // MAIN CALCULATOR
+  function calculateEarnings(save = true) {
+    const platform = selectedPlatform("platform");
+    const country = selectedCountry("country");
+    const views = numericValue("views");
 
-function setRateNote(text) { const el = $("rateNote"); if (el) el.textContent = text; }
+    const low = estimate(platform, views, country, "low");
+    const high = estimate(platform, views, country, "high");
+    const daily = estimate(platform, views, country);
+    const monthly = daily * 30;
+    const yearly = daily * 365;
 
-function applyRates(data, label) {
-    Object.keys(data).forEach(function (code) {
-        if (typeof data[code] === "number" && data[code] > 0) rates[code] = data[code];
-    });
-    setRateNote(label);
-    if (lastCalc && !$("result").classList.contains("hidden")) calculateEarnings(true);
-    updateGoalModes();
-    comparePlatforms();
-}
+    // Main amounts remain in USD.
+    $("dailyEarnings").textContent = money(daily, "USD");
+    $("monthlyEarnings").textContent = money(monthly, "USD");
+    $("yearlyEarnings").textContent = money(yearly, "USD");
 
-function loadRates() {
-    setRateNote("Exchange rates are approximate.");
-    try {
-        const cached = JSON.parse(storageGet("creatorCalcRates"));
-        if (cached && Date.now() - cached.time < 12 * 3600 * 1000) {
-            applyRates(cached.rates, "Exchange rates: live (cached " + new Date(cached.time).toLocaleDateString() + ").");
-            return;
-        }
-    } catch (e) { /* ignore */ }
+    // Show the selected country's currency alongside each USD amount.
+    $("dailyLocal").textContent =
+      `Also: ${dualMoney(daily, country)}`;
 
-    if (!window.fetch) return;
-    fetch("https://open.er-api.com/v6/latest/USD")
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-            if (data && data.rates) {
-                storageSet("creatorCalcRates", JSON.stringify({ time: Date.now(), rates: data.rates }));
-                applyRates(data.rates, "Exchange rates: live (updated " + new Date().toLocaleDateString() + ").");
-            }
-        })
-        .catch(function () { setRateNote("Exchange rates are approximate (live rates unavailable)."); });
-}
+    $("monthlyLocal").textContent =
+      `Also: ${dualMoney(monthly, country)}`;
 
-/* ---------- MAIN CALCULATOR ---------- */
+    $("yearlyLocal").textContent =
+      `Also: ${dualMoney(yearly, country)}`;
 
-function calcRange(platformKey, countryKey, views) {
-    const rate = rpmRates[platformKey], m = countries[countryKey].m;
-    const low = (views / 1000) * rate.min * m;
-    const high = (views / 1000) * rate.max * m;
-    return { low: low, high: high, avg: (low + high) / 2 };
-}
-
-function calculateEarnings(silent) {
-    const pKey = $("platform").value, cKey = $("country").value;
-    const views = Number($("views").value);
-
-    if (!views || views <= 0) {
-        if (!silent) alert("Please enter a valid number of monthly views.");
-        return;
+    if ($("localLabel")) {
+      $("localLabel").textContent =
+        `Selected currency (${getCurrency(country).code}):`;
     }
 
-    const cur = curOf(cKey), r = calcRange(pKey, cKey, views);
-    const showLocal = cur !== "USD";
-
-    $("earnings").textContent = fmtUSD(r.avg);
-    $("localBox").classList.toggle("hidden", !showLocal);
-    $("localEarnings").textContent = fmtCur(toLocal(r.avg, cur), cur);
-    $("localLabel").textContent = (currencyNames[cur] || cur) + " / month (average)";
-
-    const parts = [["daily", r.avg / 30], ["monthly", r.avg], ["yearly", r.avg * 12]];
-    parts.forEach(function (p) {
-        $(p[0] + "Earnings").textContent = fmtUSD(p[1]);
-        $(p[0] + "Local").textContent = showLocal ? fmtCur(toLocal(p[1], cur), cur) : "";
-    });
-
-    const rpm = rpmRates[pKey], m = countries[cKey].m;
-    $("rpmInfo").textContent = "Estimated RPM for " + countries[cKey].n + ": " +
-        fmtUSD(rpm.min * m) + " to " + fmtUSD(rpm.max * m) + " per 1,000 views";
-
-    $("resultDescription").textContent =
-        platformNames[pKey] + " with " + num(views) + " monthly views could generate roughly " +
-        fmtUSD(r.low) + " to " + fmtUSD(r.high) + " per month" +
-        (showLocal ? " (about " + fmtCur(toLocal(r.low, cur), cur) + " to " + fmtCur(toLocal(r.high, cur), cur) + ")" : "") +
-        ". Actual earnings can vary.";
-
-    $("result").classList.remove("hidden");
-    lastCalc = { platform: pKey, country: cKey, views: views, low: r.low, high: r.high, avg: r.avg };
-
-    if (!silent) {
-        saveCalculation(lastCalc);
-        displayHistory();
-        $("result").scrollIntoView({ behavior: "smooth", block: "center" });
+    if ($("localEarnings")) {
+      $("localEarnings").textContent =
+        money(daily * getCurrency(country).rate,
+          getCurrency(country).code);
     }
-}
 
-/* ---------- COPY / SHARE ---------- */
-
-function copyText(text) {
-    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
-    return new Promise(function (resolve, reject) {
-        const area = document.createElement("textarea");
-        area.value = text; area.style.position = "fixed"; area.style.opacity = "0";
-        document.body.appendChild(area); area.focus(); area.select();
-        try { const ok = document.execCommand("copy"); document.body.removeChild(area); ok ? resolve() : reject(); }
-        catch (e) { document.body.removeChild(area); reject(e); }
-    });
-}
-
-function resultText(intro) {
-    const c = lastCalc, cur = curOf(c.country);
-    return intro + "\n\nPlatform: " + platformNames[c.platform] +
-        "\nCountry: " + countries[c.country].n +
-        "\nMonthly Views: " + num(c.views) +
-        "\nEstimated Monthly Earnings: " + fmtUSD(c.avg) +
-        (cur !== "USD" ? "\nIn " + (currencyNames[cur] || cur) + ": " + fmtCur(toLocal(c.avg, cur), cur) : "") +
-        "\nRange: " + fmtUSD(c.low) + " - " + fmtUSD(c.high);
-}
-
-function copyResult() {
-    if (!lastCalc) { alert("Please calculate your earnings first."); return; }
-    copyText(resultText("CreatorCalc Estimate"))
-        .then(function () { alert("Result copied!"); })
-        .catch(function () { alert("Could not copy the result."); });
-}
-
-function shareResult() {
-    if (!lastCalc) { alert("Please calculate your earnings first."); return; }
-    const text = resultText("I used CreatorCalc to estimate my creator earnings!") + "\n\n" + location.href;
-    if (navigator.share) {
-        navigator.share({ title: "CreatorCalc", text: text }).catch(function () { /* cancelled */ });
-    } else {
-        copyText(text).then(function () { alert("Share text copied to clipboard!"); })
-            .catch(function () { alert("Could not share the result."); });
+    if ($("rpmInfo")) {
+      $("rpmInfo").textContent =
+        `Estimated RPM range: ${money(RPM[platform].low)}–` +
+        `${money(RPM[platform].high)} per 1,000 views. ` +
+        `Currency conversion rates are approximate.`;
     }
-}
 
-/* ---------- INCOME GOAL ---------- */
-
-function updateGoalModes() {
-    const select = $("goalMode"); if (!select) return;
-    const previous = select.value;
-    const cur = curOf($("goalCountry").value);
-    select.innerHTML = "";
-    const usd = document.createElement("option");
-    usd.value = "usd"; usd.textContent = "USD ($)"; select.appendChild(usd);
-    if (cur !== "USD") {
-        const loc = document.createElement("option");
-        loc.value = "local"; loc.textContent = cur + " (" + (currencyNames[cur] || cur) + ")";
-        select.appendChild(loc);
+    if ($("resultDescription")) {
+      $("resultDescription").textContent =
+        `${PLATFORM_NAMES[platform]} estimate for ${number(views)} ` +
+        `daily views in ${country}: ${dualMoney(low, country)}–` +
+        `${dualMoney(high, country)} per day.`;
     }
-    if (previous === "local" && cur !== "USD") select.value = "local";
-}
 
-function calculateGoal() {
-    const pKey = $("goalPlatform").value, cKey = $("goalCountry").value;
-    const goal = Number($("incomeGoal").value);
-    if (!goal || goal <= 0) { alert("Please enter a valid income goal."); return; }
+    if ($("result")) $("result").hidden = false;
 
-    const cur = curOf(cKey);
-    const goalUSD = $("goalMode").value === "local" ? goal / (rates[cur] || 1) : goal;
-    const rate = rpmRates[pKey];
-    const avgRPM = ((rate.min + rate.max) / 2) * countries[cKey].m;
-    const viewsNeeded = Math.ceil((goalUSD / avgRPM) * 1000);
+    if (save) {
+      addHistory(
+        `${PLATFORM_NAMES[platform]} · ${number(views)} views/day · ` +
+        `${country} · ${dualMoney(daily, country)}/day`
+      );
+    }
 
-    $("requiredViews").textContent = num(viewsNeeded);
-    $("perDayViews").textContent = "About " + num(viewsNeeded / 30) + " views per day";
+    return { platform, country, views, daily, monthly, yearly };
+  }
+
+  // INCOME GOAL CALCULATOR
+  function calculateGoal() {
+    const mode = $("goalMode")?.value || "monthly";
+    const platform = selectedPlatform("goalPlatform");
+    const country = selectedCountry("goalCountry");
+    const goal = Number($("incomeGoal")?.value || 0);
+
+    const days = mode === "daily" ? 1 :
+      mode === "yearly" ? 365 : 30;
+
+    const rate =
+      ((RPM[platform].low + RPM[platform].high) / 2) /
+      1000 * countryMultiplier(country);
+
+    if (!(goal > 0) || !(rate > 0)) {
+      $("goalDescription").textContent =
+        "Enter an income goal greater than zero.";
+      $("requiredViews").textContent = "—";
+      $("perDayViews").textContent = "";
+      return;
+    }
+
+    const dailyViews = goal / days / rate;
+    const totalViews = dailyViews * days;
+
     $("goalDescription").textContent =
-        "To reach about " + fmtUSD(goalUSD) +
-        (cur !== "USD" ? " (" + fmtCur(toLocal(goalUSD, cur), cur) + ")" : "") +
-        " per month on " + platformNames[pKey] + " with a " + countries[cKey].n +
-        " audience, you may need around " + num(viewsNeeded) + " monthly views.";
+      `Your target is ${dualMoney(goal, country)} ` +
+      `${mode} on ${PLATFORM_NAMES[platform]}.`;
 
-    $("goalResult").classList.remove("hidden");
-    $("goalResult").scrollIntoView({ behavior: "smooth", block: "center" });
-}
+    $("requiredViews").textContent =
+      `${number(totalViews)} views per ` +
+      (mode === "daily" ? "day" :
+        mode === "yearly" ? "year" : "month");
 
-/* ---------- PLATFORM COMPARISON ---------- */
+    $("perDayViews").textContent =
+      `Approximately ${number(dailyViews)} views per day. ` +
+      "This uses estimated RPM values.";
+  }
 
-function comparePlatforms() {
-    const views = Number($("comparisonViews").value);
-    if (!views || views <= 0) { if (document.activeElement === $("compareButton")) alert("Please enter a valid number of views."); return; }
-
-    const cKey = $("comparisonCountry").value, cur = curOf(cKey);
+  // PLATFORM COMPARISON
+  function comparePlatforms() {
+    const country = selectedCountry("comparisonCountry");
+    const views = numericValue("comparisonViews");
     const body = $("comparisonBody");
-    body.innerHTML = "";
 
-    const keys = Object.keys(rpmRates);
-    const maxHigh = Math.max.apply(null, keys.map(function (k) { return calcRange(k, cKey, views).high; }));
+    if (!body) return;
+    body.replaceChildren();
 
-    keys.forEach(function (k) {
-        const r = calcRange(k, cKey, views);
-        const row = document.createElement("tr");
+    Object.keys(PLATFORM_NAMES).forEach((platform) => {
+      const low = estimate(platform, views, country, "low") * 30;
+      const high = estimate(platform, views, country, "high") * 30;
+      const average = (low + high) / 2;
 
-        const name = document.createElement("td");
-        name.textContent = platformNames[k];
-        const bar = document.createElement("div"); bar.className = "bar";
-        const fill = document.createElement("span"); fill.style.width = Math.max(3, r.high / maxHigh * 100) + "%";
-        bar.appendChild(fill); name.appendChild(bar);
+      const row = document.createElement("tr");
 
-        const low = document.createElement("td"); low.textContent = fmtUSD(r.low);
-        const high = document.createElement("td"); high.textContent = fmtUSD(r.high);
-        const avg = document.createElement("td");
-        avg.textContent = cur !== "USD" ? fmtCur(toLocal(r.avg, cur), cur) : fmtUSD(r.avg);
+      [
+        PLATFORM_NAMES[platform],
+        dualMoney(low, country),
+        dualMoney(high, country),
+        dualMoney(average, country)
+      ].forEach((value) => {
+        const cell = document.createElement("td");
+        cell.textContent = value;
+        row.appendChild(cell);
+      });
 
-        row.appendChild(name); row.appendChild(low); row.appendChild(high); row.appendChild(avg);
-        body.appendChild(row);
+      body.appendChild(row);
     });
+  }
 
-    $("avgHeader").textContent = "Average (" + cur + ")";
-}
+  // 12-MONTH PROJECTION
+  function projectGrowth() {
+    const platform = selectedPlatform("projPlatform");
+    const country = selectedCountry("projCountry");
+    const startViews = numericValue("projViews");
 
-/* ---------- 12-MONTH GROWTH PROJECTOR ---------- */
+    const growthInput = Number($("projGrowth")?.value || 0);
+    const growth = Math.max(-99, Math.min(500, growthInput)) / 100;
 
-function projectGrowth() {
-    const pKey = $("projPlatform").value, cKey = $("projCountry").value;
-    const start = Number($("projViews").value), growth = Number($("projGrowth").value);
+    const body = $("projBody");
+    if (!body) return;
 
-    if (!start || start <= 0) { alert("Please enter your current monthly views."); return; }
-    if (isNaN(growth) || growth < 0 || growth > 100) { alert("Monthly growth must be between 0 and 100 percent."); return; }
+    body.replaceChildren();
 
-    const cur = curOf(cKey), body = $("projBody");
-    body.innerHTML = "";
+    let views = startViews;
     let total = 0;
 
     for (let month = 1; month <= 12; month++) {
-        const views = start * Math.pow(1 + growth / 100, month - 1);
-        const earn = calcRange(pKey, cKey, views).avg;
-        total += earn;
+      const earnings = estimate(platform, views, country) * 30;
+      total += earnings;
 
-        const row = document.createElement("tr");
-        [("Month " + month), num(views), fmtUSD(earn), cur !== "USD" ? fmtCur(toLocal(earn, cur), cur) : "-"].forEach(function (t) {
-            const td = document.createElement("td"); td.textContent = t; row.appendChild(td);
-        });
-        body.appendChild(row);
+      const row = document.createElement("tr");
+
+      [
+        String(month),
+        number(views),
+        dualMoney(earnings, country)
+      ].forEach((value) => {
+        const cell = document.createElement("td");
+        cell.textContent = value;
+        row.appendChild(cell);
+      });
+
+      body.appendChild(row);
+      views *= 1 + growth;
     }
 
-    $("projTotal").textContent = "12-month total: " + fmtUSD(total) +
-        (cur !== "USD" ? " (about " + fmtCur(toLocal(total, cur), cur) + ")" : "");
-    $("projResult").classList.remove("hidden");
-    $("projResult").scrollIntoView({ behavior: "smooth", block: "center" });
-}
+    $("projTotal").textContent = dualMoney(total, country);
 
-/* ---------- HISTORY ---------- */
+    $("projResult").textContent =
+      `Projection assumes ${growthInput}% monthly growth. ` +
+      "Actual results can differ significantly.";
+  }
 
-function getHistory() {
-    try { const parsed = JSON.parse(storageGet("creatorCalcHistory")); return Array.isArray(parsed) ? parsed : []; }
-    catch (e) { return []; }
-}
+  // HISTORY
+  function addHistory(entry) {
+    let history = [];
 
-function saveCalculation(c) {
-    const history = getHistory();
-    history.unshift({ platform: c.platform, country: c.country, views: c.views, low: c.low, high: c.high, date: new Date().toLocaleString() });
-    if (history.length > 10) history.pop();
-    storageSet("creatorCalcHistory", JSON.stringify(history));
-}
+    try {
+      history = JSON.parse(
+        localStorage.getItem("creatorcalc-history") || "[]"
+      );
+    } catch (_) {}
 
-function displayHistory() {
-    const box = $("historyContainer"), history = getHistory();
-    box.innerHTML = "";
-    if (!history.length) {
-        const p = document.createElement("p"); p.className = "empty-history"; p.textContent = "No calculations yet.";
-        box.appendChild(p); return;
-    }
-    history.forEach(function (item) {
-        const div = document.createElement("div"); div.className = "history-item";
-        const a = document.createElement("div"); a.className = "history-platform";
-        a.textContent = (platformNames[item.platform] || item.platform) + " - " + (countries[item.country] ? countries[item.country].n : "");
-        const b = document.createElement("div"); b.textContent = num(item.views) + " monthly views";
-        const c = document.createElement("div"); c.textContent = fmtUSD(item.low) + " - " + fmtUSD(item.high);
-        const d = document.createElement("div"); d.className = "history-date"; d.textContent = item.date;
-        [a, b, c, d].forEach(function (el) { div.appendChild(el); });
-        box.appendChild(div);
+    history.unshift({
+      entry,
+      date: new Date().toLocaleString()
     });
-}
 
-/* ---------- EVENTS ---------- */
+    history = history.slice(0, 8);
 
-function onEnter(el, fn) { el.addEventListener("keydown", function (e) { if (e.key === "Enter") fn(); }); }
+    try {
+      localStorage.setItem(
+        "creatorcalc-history",
+        JSON.stringify(history)
+      );
+    } catch (_) {}
 
-fillCountries();
-updateGoalModes();
+    displayHistory();
+  }
 
-$("calculateButton").addEventListener("click", function () { calculateEarnings(false); });
-onEnter($("views"), function () { calculateEarnings(false); });
-$("copyButton").addEventListener("click", copyResult);
-$("shareButton").addEventListener("click", shareResult);
+  function displayHistory() {
+    const container = $("historyContainer");
+    if (!container) return;
 
-$("goalCountry").addEventListener("change", updateGoalModes);
-$("goalButton").addEventListener("click", calculateGoal);
-onEnter($("incomeGoal"), calculateGoal);
+    let history = [];
 
-$("compareButton").addEventListener("click", comparePlatforms);
-$("comparisonCountry").addEventListener("change", comparePlatforms);
-onEnter($("comparisonViews"), comparePlatforms);
+    try {
+      history = JSON.parse(
+        localStorage.getItem("creatorcalc-history") || "[]"
+      );
+    } catch (_) {}
 
-$("projButton").addEventListener("click", projectGrowth);
-onEnter($("projViews"), projectGrowth);
+    container.replaceChildren();
 
-$("clearHistory").addEventListener("click", function () { storageRemove("creatorCalcHistory"); displayHistory(); });
+    if (!history.length) {
+      const p = document.createElement("p");
+      p.className = "muted";
+      p.textContent =
+        "Your recent calculations will appear here on this device.";
+      container.appendChild(p);
+      return;
+    }
 
-displayHistory();
-comparePlatforms();
-loadRates();
+    const list = document.createElement("ul");
+
+    history.forEach((item) => {
+      const li = document.createElement("li");
+      li.textContent = `${item.entry} — ${item.date}`;
+      list.appendChild(li);
+    });
+
+    container.appendChild(list);
+  }
+
+  // COPY RESULT
+  function copyResult() {
+    const result = calculateEarnings(false);
+
+    const text =
+      `CreatorCalc estimate\n` +
+      `Platform: ${PLATFORM_NAMES[result.platform]}\n` +
+      `Country: ${result.country}\n` +
+      `Views/day: ${number(result.views)}\n` +
+      `Daily: ${dualMoney(result.daily, result.country)}\n` +
+      `Monthly: ${dualMoney(result.monthly, result.country)}\n` +
+      `Yearly: ${dualMoney(result.yearly, result.country)}\n` +
+      "Estimates only.";
+
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text)
+        .then(() => alert("Result copied."))
+        .catch(() => window.prompt("Copy your result:", text));
+    } else {
+      window.prompt("Copy your result:", text);
+    }
+  }
+
+  // SHARE RESULT
+  function shareResult() {
+    const result = calculateEarnings(false);
+
+    const text =
+      `My CreatorCalc estimate: ${PLATFORM_NAMES[result.platform]}, ` +
+      `${number(result.views)} views/day, approximately ` +
+      `${dualMoney(result.monthly, result.country)} monthly.`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: "CreatorCalc estimate",
+        text
+      }).catch(() => {});
+    } else if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text)
+        .then(() => alert("Share text copied."))
+        .catch(() => window.prompt("Copy to share:", text));
+    } else {
+      window.prompt("Copy to share:", text);
+    }
+  }
+
+  // THEME BUTTON
+  function toggleTheme() {
+    document.body.classList.toggle("light-theme");
+
+    const light = document.body.classList.contains("light-theme");
+
+    try {
+      localStorage.setItem(
+        "creatorcalc-theme",
+        light ? "light" : "dark"
+      );
+    } catch (_) {}
+
+    if ($("themeButton")) {
+      $("themeButton").textContent =
+        light ? "Dark theme" : "Light theme";
+    }
+  }
+
+  function init() {
+    fillCountries();
+
+    if ($("currentYear")) {
+      $("currentYear").textContent = new Date().getFullYear();
+    }
+
+    try {
+      if (localStorage.getItem("creatorcalc-theme") === "light") {
+        document.body.classList.add("light-theme");
+        if ($("themeButton")) {
+          $("themeButton").textContent = "Dark theme";
+        }
+      }
+    } catch (_) {}
+
+    $("calculateButton")?.addEventListener(
+      "click", () => calculateEarnings(true)
+    );
+
+    $("views")?.addEventListener("input", () => calculateEarnings(false));
+    $("platform")?.addEventListener("change", () => calculateEarnings(false));
+    $("country")?.addEventListener("change", () => calculateEarnings(false));
+
+    $("copyButton")?.addEventListener("click", copyResult);
+    $("shareButton")?.addEventListener("click", shareResult);
+
+    $("goalButton")?.addEventListener("click", calculateGoal);
+    $("goalCountry")?.addEventListener("change", calculateGoal);
+    $("goalPlatform")?.addEventListener("change", calculateGoal);
+    $("goalMode")?.addEventListener("change", calculateGoal);
+
+    $("compareButton")?.addEventListener("click", comparePlatforms);
+    $("comparisonCountry")?.addEventListener("change", comparePlatforms);
+    $("comparisonViews")?.addEventListener("input", comparePlatforms);
+
+    $("projButton")?.addEventListener("click", projectGrowth);
+    $("projCountry")?.addEventListener("change", projectGrowth);
+    $("projPlatform")?.addEventListener("change", projectGrowth);
+
+    $("themeButton")?.addEventListener("click", toggleTheme);
+
+    $("clearHistory")?.addEventListener("click", () => {
+      try {
+        localStorage.removeItem("creatorcalc-history");
+      } catch (_) {}
+      displayHistory();
+    });
+
+    calculateEarnings(false);
+    calculateGoal();
+    comparePlatforms();
+    projectGrowth();
+    displayHistory();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
