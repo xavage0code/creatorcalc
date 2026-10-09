@@ -1,530 +1,628 @@
-/* ==========================================
-   CREATORCALC STYLE SHEET
-   Original look: dark theme, cyan accent, card containers
-========================================== */
-
-:root {
-    --bg: #0b0f19;
-    --card: #111827;
-    --inner: #0b0f19;
-    --line: #263044;
-    --field-line: #364154;
-    --text: #ffffff;
-    --soft: #aeb8c9;
-    --muted: #9ca8ba;
-    --accent: #00d4ff;
-    --accent-ink: #001018;
-    --button2: #1b2433;
-    --footer: #080c14;
-    --shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
-}
-
-body.light-theme {
-    --bg: #f4f6f8;
-    --card: #ffffff;
-    --inner: #f4f6f8;
-    --line: #d9dee7;
-    --field-line: #cdd4de;
-    --text: #111827;
-    --soft: #455065;
-    --muted: #596579;
-    --accent: #0089a8;
-    --accent-ink: #ffffff;
-    --button2: #e8edf3;
-    --footer: #e9edf2;
-    --shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html {
-    scroll-behavior: smooth;
-    scroll-padding-top: 120px;
-}
-
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.6;
-}
-
-[hidden] {
-    display: none !important;
-}
-
-button,
-input,
-select {
-    font-family: inherit;
-    font-size: 16px;
-}
-
-a {
-    color: var(--accent);
-}
-
-:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-}
-
-.container {
-    width: 90%;
-    max-width: 1100px;
-    margin: 0 auto;
-}
-
-.muted {
-    color: var(--muted);
-}
-
-
-/* HEADER */
-
-.site-header {
-    background: var(--card);
-    border-bottom: 1px solid var(--line);
-    padding: 16px 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.header-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-
-.logo {
-    font-size: 25px;
-    font-weight: bold;
-    color: var(--text);
-    text-decoration: none;
-}
-
-.logo span {
-    color: var(--accent);
-}
-
-.site-header nav {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-.site-header nav a {
-    color: var(--soft);
-    text-decoration: none;
-    padding: 8px 14px;
-    border-radius: 10px;
-    font-weight: bold;
-    font-size: 15px;
-}
-
-.site-header nav a:hover {
-    background: var(--inner);
-    color: var(--text);
-}
-
-#themeButton {
-    width: auto;
-    border: 1px solid var(--line);
-    background: var(--button2);
-    color: var(--text);
-    padding: 10px 14px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: normal;
-}
-
-
-/* HERO */
-
-.hero {
-    text-align: center;
-    padding: 70px 24px;
-    margin: 36px 0 10px;
-    background: linear-gradient(135deg, var(--card), var(--bg));
-    border: 1px solid var(--line);
-    border-radius: 18px;
-}
-
-.eyebrow {
-    color: var(--accent);
-    font-weight: bold;
-    font-size: 13px;
-    letter-spacing: 2px;
-    margin-bottom: 12px;
-}
-
-.hero h1 {
-    font-size: 45px;
-    line-height: 1.2;
-    max-width: 800px;
-    margin: 0 auto 18px;
-}
-
-.hero p:last-child {
-    max-width: 650px;
-    margin: 0 auto;
-    color: var(--soft);
-    font-size: 18px;
-}
-
-
-/* PANELS (the card containers) */
-
-main.container {
-    padding-bottom: 20px;
-}
-
-.panel {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    padding: 30px;
-    max-width: 760px;
-    margin: 30px auto 0;
-    box-shadow: var(--shadow);
-}
-
-.panel > h2 {
-    font-size: 26px;
-    margin-bottom: 10px;
-}
-
-.panel > p {
-    color: var(--muted);
-    margin-bottom: 20px;
-}
-
-.panel.note > p {
-    margin-bottom: 0;
-}
-
-
-/* FORMS */
-
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 18px;
-    margin-bottom: 20px;
-}
-
-label {
-    display: block;
-    font-weight: bold;
-    font-size: 15px;
-}
-
-label select,
-label input {
-    display: block;
-    width: 100%;
-    margin-top: 8px;
-    padding: 14px;
-    border-radius: 10px;
-    border: 1px solid var(--field-line);
-    background: var(--inner);
-    color: var(--text);
-    font-weight: normal;
-    outline: none;
-}
-
-label select:focus,
-label input:focus {
-    border-color: var(--accent);
-}
-
-
-/* BUTTONS */
-
-button {
-    cursor: pointer;
-}
-
-.panel > button,
-.button-row button {
-    padding: 15px;
-    border: none;
-    border-radius: 10px;
-    font-weight: bold;
-}
-
-.panel > button {
-    width: 100%;
-    background: var(--accent);
-    color: var(--accent-ink);
-}
-
-.panel > button:hover {
-    opacity: 0.85;
-}
-
-.button-row {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.button-row button {
-    flex: 1;
-    background: var(--button2);
-    color: var(--text);
-    border: 1px solid var(--line);
-    font-weight: normal;
-}
-
-#clearHistory {
-    width: auto;
-    margin-top: 20px;
-    padding: 10px 15px;
-    background: var(--button2);
-    color: var(--text);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    font-weight: normal;
-}
-
-
-/* RESULTS */
-
-.result-area,
-#goalResult {
-    margin-top: 28px;
-    padding: 28px;
-    text-align: center;
-    background: var(--card);
-    border: 1px solid var(--accent);
-    border-radius: 18px;
-}
-
-.result-area h3 {
-    font-size: 22px;
-    margin-bottom: 10px;
-}
-
-#resultDescription,
-#goalDescription {
-    color: var(--soft);
-    margin-bottom: 20px;
-}
-
-.earnings-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-}
-
-.earnings-grid > div {
-    background: var(--inner);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 18px;
-}
-
-.earnings-grid span {
-    display: block;
-    color: var(--muted);
-    font-size: 14px;
-    margin-bottom: 5px;
-}
-
-.earnings-grid strong {
-    display: block;
-    font-size: 22px;
-    color: var(--accent);
-}
-
-.earnings-grid small {
-    display: block;
-    color: var(--muted);
-    font-size: 13px;
-    margin-top: 6px;
-}
-
-#localBox {
-    margin: 22px 0 6px;
-    padding: 18px;
-    background: var(--inner);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-}
-
-#localLabel {
-    display: block;
-    color: var(--muted);
-    font-size: 14px;
-}
-
-#localEarnings {
-    display: block;
-    font-size: 28px;
-    margin-top: 4px;
-}
-
-#rpmInfo {
-    margin-top: 14px;
-    font-size: 14px;
-}
-
-#requiredViews {
-    display: block;
-    font-size: 34px;
-    color: var(--accent);
-    margin: 10px 0;
-}
-
-#perDayViews {
-    color: var(--soft);
-}
-
-#projResult {
-    margin: 18px 0 0;
-    color: var(--muted);
-    font-size: 14px;
-}
-
-#projResult:empty {
-    display: none;
-}
-
-#projTotal {
-    color: var(--accent);
-}
-
-
-/* TABLES */
-
-.table-wrap {
-    overflow-x: auto;
-    margin-top: 24px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 520px;
-}
-
-th,
-td {
-    padding: 14px 12px;
-    border-bottom: 1px solid var(--line);
-    text-align: left;
-    font-size: 15px;
-}
-
-th {
-    color: var(--accent);
-}
-
-
-/* HISTORY */
-
-#historyContainer ul {
-    list-style: none;
-}
-
-#historyContainer li {
-    padding: 14px;
-    margin-bottom: 10px;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    background: var(--inner);
-    color: var(--soft);
-    font-size: 14px;
-}
-
-#historyContainer .muted {
-    text-align: center;
-}
-
-
-/* FOOTER */
-
-.site-footer {
-    text-align: center;
-    background: var(--footer);
-    padding: 40px 20px;
-    margin-top: 60px;
-    border-top: 1px solid var(--line);
-}
-
-.site-footer p {
-    color: var(--muted);
-    font-size: 14px;
-    margin-bottom: 6px;
-}
-
-.site-footer a {
-    text-decoration: none;
-}
-
-
-/* MOBILE */
-
-@media (max-width: 700px) {
-
-    html {
-        scroll-padding-top: 150px;
+(() => {
+  "use strict";
+
+  const $ = (id) => document.getElementById(id);
+
+  const USD_TO_TSH = 2600;
+
+  const RPM = {
+    youtube:   { low: 1, high: 8 },
+    tiktok:    { low: 0.20, high: 1 },
+    instagram: { low: 0.10, high: 1 },
+    facebook:  { low: 0.50, high: 4 },
+    website:   { low: 1, high: 10 }
+  };
+
+  const PLATFORM_NAMES = {
+    youtube: "YouTube",
+    tiktok: "TikTok",
+    instagram: "Instagram",
+    facebook: "Facebook",
+    website: "Website / blog"
+  };
+
+  // Approximate fallback rates (local units per 1 USD).
+  // Live rates replace these automatically when they can be loaded.
+  const CURRENCIES = {
+    "United States": { code: "USD", rate: 1 },
+    "United Kingdom": { code: "GBP", rate: 0.75 },
+    Canada: { code: "CAD", rate: 1.37 },
+    Australia: { code: "AUD", rate: 1.53 },
+    Germany: { code: "EUR", rate: 0.92 },
+    France: { code: "EUR", rate: 0.92 },
+    "South Africa": { code: "ZAR", rate: 18 },
+    Tanzania: { code: "TZS", rate: USD_TO_TSH },
+    Kenya: { code: "KES", rate: 130 },
+    Uganda: { code: "UGX", rate: 3700 },
+    Nigeria: { code: "NGN", rate: 1500 },
+    Ghana: { code: "GHS", rate: 15 },
+    India: { code: "INR", rate: 86 },
+    Pakistan: { code: "PKR", rate: 280 },
+    Philippines: { code: "PHP", rate: 57 },
+    Brazil: { code: "BRL", rate: 5.7 },
+    "United Arab Emirates": { code: "AED", rate: 3.67 },
+    "Saudi Arabia": { code: "SAR", rate: 3.75 },
+    Japan: { code: "JPY", rate: 150 },
+    Singapore: { code: "SGD", rate: 1.35 },
+    Other: { code: "USD", rate: 1 }
+  };
+
+  const CURRENCY_NAMES = {
+    USD: "US Dollars", GBP: "British Pounds", CAD: "Canadian Dollars",
+    AUD: "Australian Dollars", EUR: "Euros", ZAR: "South African Rand",
+    TZS: "Tanzanian Shillings", KES: "Kenyan Shillings",
+    UGX: "Ugandan Shillings", NGN: "Nigerian Naira", GHS: "Ghanaian Cedis",
+    INR: "Indian Rupees", PKR: "Pakistani Rupees", PHP: "Philippine Pesos",
+    BRL: "Brazilian Reais", AED: "UAE Dirhams", SAR: "Saudi Riyals",
+    JPY: "Japanese Yen", SGD: "Singapore Dollars"
+  };
+
+  const NO_DECIMALS = ["TZS", "UGX", "NGN", "KES", "PKR", "INR", "PHP", "JPY"];
+
+  const COUNTRY_MULTIPLIERS = {
+    "United States": 1,
+    "United Kingdom": 0.90,
+    Canada: 0.85,
+    Australia: 0.90,
+    Germany: 0.80,
+    France: 0.70,
+    "South Africa": 0.35,
+    Tanzania: 0.15,
+    Kenya: 0.20,
+    Uganda: 0.15,
+    Nigeria: 0.20,
+    Ghana: 0.20,
+    India: 0.25,
+    Pakistan: 0.15,
+    Philippines: 0.25,
+    Brazil: 0.35,
+    "United Arab Emirates": 0.80,
+    "Saudi Arabia": 0.65,
+    Japan: 0.80,
+    Singapore: 0.90
+  };
+
+  const COUNTRIES = Object.keys(CURRENCIES);
+
+  // Live exchange rates (filled in after loading).
+  let liveRates = {};
+  let ratesLabel = "Currency rates are approximate.";
+
+  /* ---------- FORMATTING ---------- */
+
+  function money(amount, currency = "USD") {
+    const value = Number.isFinite(amount) ? amount : 0;
+    const digits = NO_DECIMALS.includes(currency) ? 0 : 2;
+
+    try {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency,
+        currencyDisplay: "narrowSymbol",
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits
+      }).format(value);
+    } catch {
+      return `${currency} ${value.toFixed(digits)}`;
+    }
+  }
+
+  function number(value) {
+    return new Intl.NumberFormat("en-US", {
+      maximumFractionDigits: 0
+    }).format(Math.max(0, Math.round(value || 0)));
+  }
+
+  function numericValue(id, fallback = 0) {
+    const el = $(id);
+    const value = el ? Number(el.value) : fallback;
+    return Number.isFinite(value) ? Math.max(0, value) : fallback;
+  }
+
+  function selectedCountry(id) {
+    return $(id)?.value || "Tanzania";
+  }
+
+  function selectedPlatform(id) {
+    return $(id)?.value || "youtube";
+  }
+
+  /* ---------- CURRENCY HELPERS ---------- */
+
+  function getCurrency(country) {
+    const base = CURRENCIES[country] || CURRENCIES.Other;
+    // Use the live rate when available, otherwise the fallback rate.
+    return { code: base.code, rate: liveRates[base.code] || base.rate };
+  }
+
+  function currencyName(code) {
+    return CURRENCY_NAMES[code] || code;
+  }
+
+  // Local-currency amount only, such as "₦12,000 NGN" (empty for USD countries).
+  function localOnly(usdAmount, country) {
+    const c = getCurrency(country);
+    if (c.code === "USD") return "";
+    return `${money(usdAmount * c.rate, c.code)} ${c.code}`;
+  }
+
+  // Both currencies, such as "$8.00 USD / ₦12,000 NGN".
+  function dualMoney(usdAmount, country) {
+    const usd = `${money(usdAmount, "USD")} USD`;
+    const local = localOnly(usdAmount, country);
+    return local ? `${usd} / ${local}` : usd;
+  }
+
+  function countryMultiplier(country) {
+    return COUNTRY_MULTIPLIERS[country] ?? 0.30;
+  }
+
+  function estimate(platform, views, country, type = "average") {
+    const range = RPM[platform] || RPM.youtube;
+
+    let rate = (range.low + range.high) / 2;
+
+    if (type === "low") rate = range.low;
+    if (type === "high") rate = range.high;
+
+    return Math.max(0, views) / 1000 *
+      rate * countryMultiplier(country);
+  }
+
+  /* ---------- LIVE EXCHANGE RATES ---------- */
+
+  function refreshAll() {
+    calculateEarnings(false);
+    calculateGoal();
+    comparePlatforms();
+    projectGrowth();
+  }
+
+  function applyRates(rates, label) {
+    liveRates = rates || {};
+    ratesLabel = label;
+    refreshAll();
+  }
+
+  function loadRates() {
+    try {
+      const cached = JSON.parse(
+        localStorage.getItem("creatorcalc-rates") || "null"
+      );
+
+      if (cached && Date.now() - cached.time < 12 * 3600 * 1000) {
+        applyRates(
+          cached.rates,
+          `Live exchange rates (saved ${new Date(cached.time).toLocaleDateString()}).`
+        );
+        return;
+      }
+    } catch (_) {}
+
+    if (!window.fetch) return;
+
+    fetch("https://open.er-api.com/v6/latest/USD")
+      .then((response) => response.json())
+      .then((data) => {
+        if (!data || !data.rates) return;
+
+        try {
+          localStorage.setItem(
+            "creatorcalc-rates",
+            JSON.stringify({ time: Date.now(), rates: data.rates })
+          );
+        } catch (_) {}
+
+        applyRates(
+          data.rates,
+          `Live exchange rates (updated ${new Date().toLocaleDateString()}).`
+        );
+      })
+      .catch(() => {
+        ratesLabel =
+          "Live rates unavailable, so approximate rates are used.";
+        refreshAll();
+      });
+  }
+
+  function fillCountries() {
+    [
+      "country",
+      "goalCountry",
+      "comparisonCountry",
+      "projCountry"
+    ].forEach((id) => {
+      const select = $(id);
+      if (!select) return;
+
+      const previous = select.value;
+      select.replaceChildren();
+
+      COUNTRIES.forEach((country) => {
+        const option = document.createElement("option");
+        const code = CURRENCIES[country].code;
+        option.value = country;
+        option.textContent =
+          code === "USD" ? country : `${country} (${code})`;
+        select.appendChild(option);
+      });
+
+      select.value = COUNTRIES.includes(previous)
+        ? previous
+        : "Tanzania";
+    });
+  }
+
+  /* ---------- MAIN CALCULATOR ---------- */
+
+  function calculateEarnings(save = true) {
+    const platform = selectedPlatform("platform");
+    const country = selectedCountry("country");
+    const views = numericValue("views");
+
+    const low = estimate(platform, views, country, "low");
+    const high = estimate(platform, views, country, "high");
+    const daily = estimate(platform, views, country);
+    const monthly = daily * 30;
+    const yearly = daily * 365;
+
+    const currency = getCurrency(country);
+
+    // USD amounts (main figures).
+    $("dailyEarnings").textContent = money(daily, "USD");
+    $("monthlyEarnings").textContent = money(monthly, "USD");
+    $("yearlyEarnings").textContent = money(yearly, "USD");
+
+    // Selected country's currency under each USD amount.
+    $("dailyLocal").textContent = localOnly(daily, country);
+    $("monthlyLocal").textContent = localOnly(monthly, country);
+    $("yearlyLocal").textContent = localOnly(yearly, country);
+
+    if ($("localLabel")) {
+      $("localLabel").textContent = currency.code === "USD"
+        ? "Estimated monthly earnings (USD)"
+        : `Estimated monthly earnings in ${currencyName(currency.code)} (${currency.code})`;
     }
 
-    .site-header nav {
-        order: 3;
-        width: 100%;
-        overflow-x: auto;
-        flex-wrap: nowrap;
+    if ($("localEarnings")) {
+      $("localEarnings").textContent = currency.code === "USD"
+        ? money(monthly, "USD")
+        : `${money(monthly * currency.rate, currency.code)} ${currency.code}`;
     }
 
-    .site-header nav a {
-        white-space: nowrap;
+    if ($("rpmInfo")) {
+      const lowRpm = RPM[platform].low * countryMultiplier(country);
+      const highRpm = RPM[platform].high * countryMultiplier(country);
+
+      $("rpmInfo").textContent =
+        `Estimated RPM for ${country}: ${money(lowRpm)}–${money(highRpm)} ` +
+        `per 1,000 views. ${ratesLabel}`;
     }
 
-    .hero {
-        padding: 44px 18px;
+    if ($("resultDescription")) {
+      $("resultDescription").textContent =
+        `${PLATFORM_NAMES[platform]} estimate for ${number(views)} ` +
+        `daily views in ${country}: ${dualMoney(low, country)} to ` +
+        `${dualMoney(high, country)} per day.`;
     }
 
-    .hero h1 {
-        font-size: 30px;
+    if ($("result")) $("result").hidden = false;
+
+    if (save) {
+      addHistory(
+        `${PLATFORM_NAMES[platform]} · ${number(views)} views/day · ` +
+        `${country} · ${dualMoney(daily, country)} per day`
+      );
     }
 
-    .hero p:last-child {
-        font-size: 16px;
+    return { platform, country, views, daily, monthly, yearly };
+  }
+
+  /* ---------- INCOME GOAL CALCULATOR ---------- */
+
+  function calculateGoal() {
+    const mode = $("goalMode")?.value || "monthly";
+    const platform = selectedPlatform("goalPlatform");
+    const country = selectedCountry("goalCountry");
+    const goal = Number($("incomeGoal")?.value || 0);
+
+    const days = mode === "daily" ? 1 :
+      mode === "yearly" ? 365 : 30;
+
+    const rate =
+      ((RPM[platform].low + RPM[platform].high) / 2) /
+      1000 * countryMultiplier(country);
+
+    if (!(goal > 0) || !(rate > 0)) {
+      $("goalDescription").textContent =
+        "Enter an income goal greater than zero.";
+      $("requiredViews").textContent = "—";
+      $("perDayViews").textContent = "";
+      return;
     }
 
-    .panel {
-        padding: 22px;
+    const dailyViews = goal / days / rate;
+    const totalViews = dailyViews * days;
+
+    $("goalDescription").textContent =
+      `Your target is ${dualMoney(goal, country)} ` +
+      `${mode} on ${PLATFORM_NAMES[platform]}.`;
+
+    $("requiredViews").textContent =
+      `${number(totalViews)} views per ` +
+      (mode === "daily" ? "day" :
+        mode === "yearly" ? "year" : "month");
+
+    $("perDayViews").textContent =
+      `Approximately ${number(dailyViews)} views per day. ` +
+      "This uses estimated RPM values.";
+  }
+
+  /* ---------- PLATFORM COMPARISON ---------- */
+
+  function comparePlatforms() {
+    const country = selectedCountry("comparisonCountry");
+    const views = numericValue("comparisonViews");
+    const body = $("comparisonBody");
+
+    if (!body) return;
+    body.replaceChildren();
+
+    Object.keys(PLATFORM_NAMES).forEach((platform) => {
+      const low = estimate(platform, views, country, "low") * 30;
+      const high = estimate(platform, views, country, "high") * 30;
+      const average = (low + high) / 2;
+
+      const row = document.createElement("tr");
+
+      [
+        PLATFORM_NAMES[platform],
+        dualMoney(low, country),
+        dualMoney(high, country),
+        dualMoney(average, country)
+      ].forEach((value) => {
+        const cell = document.createElement("td");
+        cell.textContent = value;
+        row.appendChild(cell);
+      });
+
+      body.appendChild(row);
+    });
+  }
+
+  /* ---------- 12-MONTH PROJECTION ---------- */
+
+  function projectGrowth() {
+    const platform = selectedPlatform("projPlatform");
+    const country = selectedCountry("projCountry");
+    const startViews = numericValue("projViews");
+
+    const growthInput = Number($("projGrowth")?.value || 0);
+    const growth = Math.max(-99, Math.min(500, growthInput)) / 100;
+
+    const body = $("projBody");
+    if (!body) return;
+
+    body.replaceChildren();
+
+    let views = startViews;
+    let total = 0;
+
+    for (let month = 1; month <= 12; month++) {
+      const earnings = estimate(platform, views, country) * 30;
+      total += earnings;
+
+      const row = document.createElement("tr");
+
+      [
+        String(month),
+        number(views),
+        dualMoney(earnings, country)
+      ].forEach((value) => {
+        const cell = document.createElement("td");
+        cell.textContent = value;
+        row.appendChild(cell);
+      });
+
+      body.appendChild(row);
+      views *= 1 + growth;
     }
 
-    .earnings-grid {
-        grid-template-columns: 1fr;
+    $("projTotal").textContent = dualMoney(total, country);
+
+    $("projResult").textContent =
+      `Projection assumes ${growthInput}% monthly growth. ` +
+      "Actual results can differ significantly.";
+  }
+
+  /* ---------- HISTORY ---------- */
+
+  function addHistory(entry) {
+    let history = [];
+
+    try {
+      history = JSON.parse(
+        localStorage.getItem("creatorcalc-history") || "[]"
+      );
+    } catch (_) {}
+
+    history.unshift({
+      entry,
+      date: new Date().toLocaleString()
+    });
+
+    history = history.slice(0, 8);
+
+    try {
+      localStorage.setItem(
+        "creatorcalc-history",
+        JSON.stringify(history)
+      );
+    } catch (_) {}
+
+    displayHistory();
+  }
+
+  function displayHistory() {
+    const container = $("historyContainer");
+    if (!container) return;
+
+    let history = [];
+
+    try {
+      history = JSON.parse(
+        localStorage.getItem("creatorcalc-history") || "[]"
+      );
+    } catch (_) {}
+
+    container.replaceChildren();
+
+    if (!history.length) {
+      const p = document.createElement("p");
+      p.className = "muted";
+      p.textContent =
+        "Your recent calculations will appear here on this device.";
+      container.appendChild(p);
+      return;
     }
 
-    .button-row {
-        flex-direction: column;
+    const list = document.createElement("ul");
+
+    history.forEach((item) => {
+      const li = document.createElement("li");
+      li.textContent = `${item.entry} — ${item.date}`;
+      list.appendChild(li);
+    });
+
+    container.appendChild(list);
+  }
+
+  /* ---------- COPY / SHARE ---------- */
+
+  function copyResult() {
+    const result = calculateEarnings(false);
+
+    const text =
+      `CreatorCalc estimate\n` +
+      `Platform: ${PLATFORM_NAMES[result.platform]}\n` +
+      `Country: ${result.country}\n` +
+      `Views/day: ${number(result.views)}\n` +
+      `Daily: ${dualMoney(result.daily, result.country)}\n` +
+      `Monthly: ${dualMoney(result.monthly, result.country)}\n` +
+      `Yearly: ${dualMoney(result.yearly, result.country)}\n` +
+      "Estimates only.";
+
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text)
+        .then(() => alert("Result copied."))
+        .catch(() => window.prompt("Copy your result:", text));
+    } else {
+      window.prompt("Copy your result:", text);
+    }
+  }
+
+  function shareResult() {
+    const result = calculateEarnings(false);
+
+    const text =
+      `My CreatorCalc estimate: ${PLATFORM_NAMES[result.platform]}, ` +
+      `${number(result.views)} views/day, approximately ` +
+      `${dualMoney(result.monthly, result.country)} monthly.`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: "CreatorCalc estimate",
+        text
+      }).catch(() => {});
+    } else if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text)
+        .then(() => alert("Share text copied."))
+        .catch(() => window.prompt("Copy to share:", text));
+    } else {
+      window.prompt("Copy to share:", text);
+    }
+  }
+
+  /* ---------- THEME ---------- */
+
+  function toggleTheme() {
+    document.body.classList.toggle("light-theme");
+
+    const light = document.body.classList.contains("light-theme");
+
+    try {
+      localStorage.setItem(
+        "creatorcalc-theme",
+        light ? "light" : "dark"
+      );
+    } catch (_) {}
+
+    if ($("themeButton")) {
+      $("themeButton").textContent =
+        light ? "Dark theme" : "Light theme";
+    }
+  }
+
+  /* ---------- START ---------- */
+
+  function init() {
+    fillCountries();
+
+    if ($("currentYear")) {
+      $("currentYear").textContent = new Date().getFullYear();
     }
 
-    #requiredViews {
-        font-size: 26px;
-    }
+    try {
+      if (localStorage.getItem("creatorcalc-theme") === "light") {
+        document.body.classList.add("light-theme");
+        if ($("themeButton")) {
+          $("themeButton").textContent = "Dark theme";
+        }
+      }
+    } catch (_) {}
 
-}
+    $("calculateButton")?.addEventListener(
+      "click", () => calculateEarnings(true)
+    );
 
-@media (prefers-reduced-motion: reduce) {
+    $("views")?.addEventListener("input", () => calculateEarnings(false));
+    $("platform")?.addEventListener("change", () => calculateEarnings(false));
+    $("country")?.addEventListener("change", () => calculateEarnings(false));
 
-    html {
-        scroll-behavior: auto;
-    }
+    $("copyButton")?.addEventListener("click", copyResult);
+    $("shareButton")?.addEventListener("click", shareResult);
 
-}
+    $("goalButton")?.addEventListener("click", calculateGoal);
+    $("goalCountry")?.addEventListener("change", calculateGoal);
+    $("goalPlatform")?.addEventListener("change", calculateGoal);
+    $("goalMode")?.addEventListener("change", calculateGoal);
+    $("incomeGoal")?.addEventListener("input", calculateGoal);
+
+    $("compareButton")?.addEventListener("click", comparePlatforms);
+    $("comparisonCountry")?.addEventListener("change", comparePlatforms);
+    $("comparisonViews")?.addEventListener("input", comparePlatforms);
+
+    $("projButton")?.addEventListener("click", projectGrowth);
+    $("projCountry")?.addEventListener("change", projectGrowth);
+    $("projPlatform")?.addEventListener("change", projectGrowth);
+
+    $("themeButton")?.addEventListener("click", toggleTheme);
+
+    $("clearHistory")?.addEventListener("click", () => {
+      try {
+        localStorage.removeItem("creatorcalc-history");
+      } catch (_) {}
+      displayHistory();
+    });
+
+    refreshAll();
+    displayHistory();
+    loadRates();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
