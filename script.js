@@ -1,12 +1,11 @@
 /* ==========================================
-   CREATORCALC JAVASCRIPT
+   CREATORCALC - CALCULATOR SCRIPT
 ========================================== */
+"use strict";
 
-/* SETTINGS */
+/* ---------- SETTINGS ---------- */
 
-const USD_TO_TSH = 2600;
-
-// Simplified estimate ranges. NOT guaranteed platform payouts.
+// Simplified RPM ranges (USD per 1,000 views). Estimates only.
 const rpmRates = {
     youtube:   { min: 1,    max: 8 },
     tiktok:    { min: 0.20, max: 1 },
@@ -15,480 +14,391 @@ const rpmRates = {
     website:   { min: 1,    max: 10 }
 };
 
-const countryMultipliers = {
-    tz: 0.55,
-    ke: 0.65,
-    ug: 0.55,
-    ng: 0.65,
-    gh: 0.70,
-    za: 0.90,
-    us: 1,
-    uk: 0.95,
-    ca: 0.95,
-    au: 0.95,
-    other: 0.75
-};
-
 const platformNames = {
-    youtube: "YouTube",
-    tiktok: "TikTok",
-    instagram: "Instagram",
-    facebook: "Facebook",
-    website: "Website"
+    youtube: "YouTube", tiktok: "TikTok", instagram: "Instagram",
+    facebook: "Facebook", website: "Website"
 };
 
+// n = name, c = currency code, m = audience value multiplier
+const countries = {
+    tz: { n: "Tanzania",       c: "TZS", m: 0.55 },
+    ke: { n: "Kenya",          c: "KES", m: 0.65 },
+    ug: { n: "Uganda",         c: "UGX", m: 0.55 },
+    rw: { n: "Rwanda",         c: "RWF", m: 0.55 },
+    et: { n: "Ethiopia",       c: "ETB", m: 0.45 },
+    zm: { n: "Zambia",         c: "ZMW", m: 0.55 },
+    ng: { n: "Nigeria",        c: "NGN", m: 0.65 },
+    gh: { n: "Ghana",          c: "GHS", m: 0.70 },
+    za: { n: "South Africa",   c: "ZAR", m: 0.90 },
+    eg: { n: "Egypt",          c: "EGP", m: 0.55 },
+    in: { n: "India",          c: "INR", m: 0.40 },
+    pk: { n: "Pakistan",       c: "PKR", m: 0.35 },
+    ph: { n: "Philippines",    c: "PHP", m: 0.50 },
+    br: { n: "Brazil",         c: "BRL", m: 0.55 },
+    ae: { n: "United Arab Emirates", c: "AED", m: 0.90 },
+    de: { n: "Germany",        c: "EUR", m: 0.95 },
+    uk: { n: "United Kingdom", c: "GBP", m: 0.95 },
+    ca: { n: "Canada",         c: "CAD", m: 0.95 },
+    au: { n: "Australia",      c: "AUD", m: 0.95 },
+    us: { n: "United States",  c: "USD", m: 1 },
+    other: { n: "Other country", c: "USD", m: 0.75 }
+};
 
-/* GET HTML ELEMENTS */
+const currencyNames = {
+    USD: "US Dollars", TZS: "Tanzanian Shillings", KES: "Kenyan Shillings",
+    UGX: "Ugandan Shillings", RWF: "Rwandan Francs", ETB: "Ethiopian Birr",
+    ZMW: "Zambian Kwacha", NGN: "Nigerian Naira", GHS: "Ghanaian Cedis",
+    ZAR: "South African Rand", EGP: "Egyptian Pounds", INR: "Indian Rupees",
+    PKR: "Pakistani Rupees", PHP: "Philippine Pesos", BRL: "Brazilian Reais",
+    AED: "UAE Dirhams", EUR: "Euros", GBP: "British Pounds",
+    CAD: "Canadian Dollars", AUD: "Australian Dollars"
+};
 
-const platform = document.getElementById("platform");
-const country = document.getElementById("country");
-const views = document.getElementById("views");
-const calculateButton = document.getElementById("calculateButton");
+// Approximate fallback rates (units per 1 USD), used if live rates cannot load.
+let rates = {
+    USD: 1, TZS: 2600, KES: 129, UGX: 3650, RWF: 1400, ETB: 135, ZMW: 26,
+    NGN: 1550, GHS: 12, ZAR: 18, EGP: 49, INR: 85, PKR: 280, PHP: 57,
+    BRL: 5.5, AED: 3.67, EUR: 0.92, GBP: 0.78, CAD: 1.38, AUD: 1.52
+};
 
-const result = document.getElementById("result");
-const earnings = document.getElementById("earnings");
-const tshEarnings = document.getElementById("tshEarnings");
-const dailyEarnings = document.getElementById("dailyEarnings");
-const monthlyEarnings = document.getElementById("monthlyEarnings");
-const yearlyEarnings = document.getElementById("yearlyEarnings");
-const resultDescription = document.getElementById("resultDescription");
+const noDecimals = ["TZS", "UGX", "RWF", "ETB", "NGN", "KES", "PKR", "INR", "PHP"];
 
-const shareButton = document.getElementById("shareButton");
-const copyButton = document.getElementById("copyButton");
+const $ = function (id) { return document.getElementById(id); };
+let lastCalc = null;
 
-const goalPlatform = document.getElementById("goalPlatform");
-const goalCountry = document.getElementById("goalCountry");
-const incomeGoal = document.getElementById("incomeGoal");
-const goalButton = document.getElementById("goalButton");
+/* ---------- SAFE STORAGE ---------- */
 
-const goalResult = document.getElementById("goalResult");
-const requiredViews = document.getElementById("requiredViews");
-const goalDescription = document.getElementById("goalDescription");
+function storageGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+function storageSet(key, value) { try { localStorage.setItem(key, value); } catch (e) { /* ignore */ } }
+function storageRemove(key) { try { localStorage.removeItem(key); } catch (e) { /* ignore */ } }
 
-const comparisonCountry = document.getElementById("comparisonCountry");
-const comparisonViews = document.getElementById("comparisonViews");
-const compareButton = document.getElementById("compareButton");
-const comparisonBody = document.getElementById("comparisonBody");
+/* ---------- FORMATTING ---------- */
 
-const historyContainer = document.getElementById("historyContainer");
-const clearHistory = document.getElementById("clearHistory");
+function toLocal(usd, code) { return usd * (rates[code] || 1); }
 
-const themeButton = document.getElementById("themeButton");
-
-
-/* SAFE STORAGE (won't crash if storage is blocked) */
-
-function storageGet(key) {
+function fmtCur(amount, code) {
+    const d = noDecimals.indexOf(code) > -1 ? 0 : 2;
     try {
-        return localStorage.getItem(key);
-    } catch (error) {
-        return null;
+        return new Intl.NumberFormat("en-US", {
+            style: "currency", currency: code,
+            minimumFractionDigits: d, maximumFractionDigits: d
+        }).format(amount);
+    } catch (e) {
+        return code + " " + Math.round(amount).toLocaleString("en-US");
     }
 }
+function fmtUSD(amount) { return fmtCur(amount, "USD"); }
+function num(n) { return Math.round(n).toLocaleString("en-US"); }
+function curOf(countryKey) { return countries[countryKey].c; }
 
-function storageSet(key, value) {
-    try {
-        localStorage.setItem(key, value);
-    } catch (error) {
-        /* ignore */
-    }
-}
+/* ---------- COUNTRY DROPDOWNS ---------- */
 
-function storageRemove(key) {
-    try {
-        localStorage.removeItem(key);
-    } catch (error) {
-        /* ignore */
-    }
-}
-
-
-/* FORMAT MONEY */
-
-function formatUSD(amount) {
-    return "$" + amount.toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+function fillCountries() {
+    ["country", "goalCountry", "comparisonCountry", "projCountry"].forEach(function (id) {
+        const select = $(id);
+        if (!select) return;
+        Object.keys(countries).forEach(function (key) {
+            const option = document.createElement("option");
+            option.value = key;
+            option.textContent = countries[key].n + (countries[key].c !== "USD" ? " (" + countries[key].c + ")" : "");
+            select.appendChild(option);
+        });
     });
 }
 
-function formatTSH(amount) {
-    return "TSh " + Math.round(amount).toLocaleString("en-US");
+/* ---------- LIVE EXCHANGE RATES ---------- */
+
+function setRateNote(text) { const el = $("rateNote"); if (el) el.textContent = text; }
+
+function applyRates(data, label) {
+    Object.keys(data).forEach(function (code) {
+        if (typeof data[code] === "number" && data[code] > 0) rates[code] = data[code];
+    });
+    setRateNote(label);
+    if (lastCalc && !$("result").classList.contains("hidden")) calculateEarnings(true);
+    updateGoalModes();
+    comparePlatforms();
 }
 
+function loadRates() {
+    setRateNote("Exchange rates are approximate.");
+    try {
+        const cached = JSON.parse(storageGet("creatorCalcRates"));
+        if (cached && Date.now() - cached.time < 12 * 3600 * 1000) {
+            applyRates(cached.rates, "Exchange rates: live (cached " + new Date(cached.time).toLocaleDateString() + ").");
+            return;
+        }
+    } catch (e) { /* ignore */ }
 
-/* COPY TEXT (with fallback) */
+    if (!window.fetch) return;
+    fetch("https://open.er-api.com/v6/latest/USD")
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (data && data.rates) {
+                storageSet("creatorCalcRates", JSON.stringify({ time: Date.now(), rates: data.rates }));
+                applyRates(data.rates, "Exchange rates: live (updated " + new Date().toLocaleDateString() + ").");
+            }
+        })
+        .catch(function () { setRateNote("Exchange rates are approximate (live rates unavailable)."); });
+}
+
+/* ---------- MAIN CALCULATOR ---------- */
+
+function calcRange(platformKey, countryKey, views) {
+    const rate = rpmRates[platformKey], m = countries[countryKey].m;
+    const low = (views / 1000) * rate.min * m;
+    const high = (views / 1000) * rate.max * m;
+    return { low: low, high: high, avg: (low + high) / 2 };
+}
+
+function calculateEarnings(silent) {
+    const pKey = $("platform").value, cKey = $("country").value;
+    const views = Number($("views").value);
+
+    if (!views || views <= 0) {
+        if (!silent) alert("Please enter a valid number of monthly views.");
+        return;
+    }
+
+    const cur = curOf(cKey), r = calcRange(pKey, cKey, views);
+    const showLocal = cur !== "USD";
+
+    $("earnings").textContent = fmtUSD(r.avg);
+    $("localBox").classList.toggle("hidden", !showLocal);
+    $("localEarnings").textContent = fmtCur(toLocal(r.avg, cur), cur);
+    $("localLabel").textContent = (currencyNames[cur] || cur) + " / month (average)";
+
+    const parts = [["daily", r.avg / 30], ["monthly", r.avg], ["yearly", r.avg * 12]];
+    parts.forEach(function (p) {
+        $(p[0] + "Earnings").textContent = fmtUSD(p[1]);
+        $(p[0] + "Local").textContent = showLocal ? fmtCur(toLocal(p[1], cur), cur) : "";
+    });
+
+    const rpm = rpmRates[pKey], m = countries[cKey].m;
+    $("rpmInfo").textContent = "Estimated RPM for " + countries[cKey].n + ": " +
+        fmtUSD(rpm.min * m) + " to " + fmtUSD(rpm.max * m) + " per 1,000 views";
+
+    $("resultDescription").textContent =
+        platformNames[pKey] + " with " + num(views) + " monthly views could generate roughly " +
+        fmtUSD(r.low) + " to " + fmtUSD(r.high) + " per month" +
+        (showLocal ? " (about " + fmtCur(toLocal(r.low, cur), cur) + " to " + fmtCur(toLocal(r.high, cur), cur) + ")" : "") +
+        ". Actual earnings can vary.";
+
+    $("result").classList.remove("hidden");
+    lastCalc = { platform: pKey, country: cKey, views: views, low: r.low, high: r.high, avg: r.avg };
+
+    if (!silent) {
+        saveCalculation(lastCalc);
+        displayHistory();
+        $("result").scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+}
+
+/* ---------- COPY / SHARE ---------- */
 
 function copyText(text) {
-
-    if (navigator.clipboard && window.isSecureContext) {
-        return navigator.clipboard.writeText(text);
-    }
-
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
     return new Promise(function (resolve, reject) {
-
         const area = document.createElement("textarea");
-        area.value = text;
-        area.style.position = "fixed";
-        area.style.opacity = "0";
-        document.body.appendChild(area);
-        area.focus();
-        area.select();
-
-        try {
-            const ok = document.execCommand("copy");
-            document.body.removeChild(area);
-            ok ? resolve() : reject();
-        } catch (error) {
-            document.body.removeChild(area);
-            reject(error);
-        }
+        area.value = text; area.style.position = "fixed"; area.style.opacity = "0";
+        document.body.appendChild(area); area.focus(); area.select();
+        try { const ok = document.execCommand("copy"); document.body.removeChild(area); ok ? resolve() : reject(); }
+        catch (e) { document.body.removeChild(area); reject(e); }
     });
 }
 
-
-/* MAIN CALCULATOR */
-
-function calculateEarnings() {
-
-    const selectedPlatform = platform.value;
-    const selectedCountry = country.value;
-    const viewAmount = Number(views.value);
-
-    if (!viewAmount || viewAmount <= 0) {
-        alert("Please enter a valid number of monthly views.");
-        return;
-    }
-
-    const rate = rpmRates[selectedPlatform];
-    const multiplier = countryMultipliers[selectedCountry];
-
-    const lowEarnings = (viewAmount / 1000) * rate.min * multiplier;
-    const highEarnings = (viewAmount / 1000) * rate.max * multiplier;
-    const averageEarnings = (lowEarnings + highEarnings) / 2;
-
-    const daily = averageEarnings / 30;
-    const yearly = averageEarnings * 12;
-    const tsh = averageEarnings * USD_TO_TSH;
-
-    earnings.textContent = formatUSD(averageEarnings);
-    tshEarnings.textContent = formatTSH(tsh);
-    dailyEarnings.textContent = formatUSD(daily);
-    monthlyEarnings.textContent = formatUSD(averageEarnings);
-    yearlyEarnings.textContent = formatUSD(yearly);
-
-    resultDescription.textContent =
-        platformNames[selectedPlatform] +
-        " with " +
-        viewAmount.toLocaleString() +
-        " monthly views could generate approximately " +
-        formatUSD(lowEarnings) +
-        " to " +
-        formatUSD(highEarnings) +
-        " per month. Actual earnings can vary.";
-
-    result.classList.remove("hidden");
-
-    saveCalculation(
-        selectedPlatform,
-        selectedCountry,
-        viewAmount,
-        lowEarnings,
-        highEarnings
-    );
-
-    displayHistory();
-
-    result.scrollIntoView({ behavior: "smooth", block: "center" });
+function resultText(intro) {
+    const c = lastCalc, cur = curOf(c.country);
+    return intro + "\n\nPlatform: " + platformNames[c.platform] +
+        "\nCountry: " + countries[c.country].n +
+        "\nMonthly Views: " + num(c.views) +
+        "\nEstimated Monthly Earnings: " + fmtUSD(c.avg) +
+        (cur !== "USD" ? "\nIn " + (currencyNames[cur] || cur) + ": " + fmtCur(toLocal(c.avg, cur), cur) : "") +
+        "\nRange: " + fmtUSD(c.low) + " - " + fmtUSD(c.high);
 }
-
-calculateButton.addEventListener("click", calculateEarnings);
-
-views.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-        calculateEarnings();
-    }
-});
-
-
-/* COPY RESULT */
 
 function copyResult() {
-
-    if (result.classList.contains("hidden")) {
-        alert("Please calculate your earnings first.");
-        return;
-    }
-
-    const text =
-        "CreatorCalc Estimate\n\n" +
-        "Platform: " + platformNames[platform.value] + "\n" +
-        "Monthly Views: " + Number(views.value).toLocaleString() + "\n" +
-        "Estimated Monthly Earnings: " + earnings.textContent + "\n" +
-        "Estimated TSh: " + tshEarnings.textContent;
-
-    copyText(text)
-        .then(function () {
-            alert("Result copied!");
-        })
-        .catch(function () {
-            alert("Could not copy the result.");
-        });
+    if (!lastCalc) { alert("Please calculate your earnings first."); return; }
+    copyText(resultText("CreatorCalc Estimate"))
+        .then(function () { alert("Result copied!"); })
+        .catch(function () { alert("Could not copy the result."); });
 }
-
-copyButton.addEventListener("click", copyResult);
-
-
-/* SHARE RESULT */
 
 function shareResult() {
-
-    if (result.classList.contains("hidden")) {
-        alert("Please calculate your earnings first.");
-        return;
-    }
-
-    const text =
-        "I used CreatorCalc to estimate my creator earnings!\n\n" +
-        platformNames[platform.value] +
-        " • " +
-        Number(views.value).toLocaleString() +
-        " monthly views\n" +
-        "Estimated: " +
-        earnings.textContent;
-
+    if (!lastCalc) { alert("Please calculate your earnings first."); return; }
+    const text = resultText("I used CreatorCalc to estimate my creator earnings!") + "\n\n" + location.href;
     if (navigator.share) {
-
-        navigator.share({
-            title: "CreatorCalc",
-            text: text
-        }).catch(function () {
-            /* user cancelled sharing */
-        });
-
+        navigator.share({ title: "CreatorCalc", text: text }).catch(function () { /* cancelled */ });
     } else {
-
-        copyText(text)
-            .then(function () {
-                alert("Share text copied to clipboard!");
-            })
-            .catch(function () {
-                alert("Could not share the result.");
-            });
+        copyText(text).then(function () { alert("Share text copied to clipboard!"); })
+            .catch(function () { alert("Could not share the result."); });
     }
 }
 
-shareButton.addEventListener("click", shareResult);
+/* ---------- INCOME GOAL ---------- */
 
-
-/* INCOME GOAL CALCULATOR */
+function updateGoalModes() {
+    const select = $("goalMode"); if (!select) return;
+    const previous = select.value;
+    const cur = curOf($("goalCountry").value);
+    select.innerHTML = "";
+    const usd = document.createElement("option");
+    usd.value = "usd"; usd.textContent = "USD ($)"; select.appendChild(usd);
+    if (cur !== "USD") {
+        const loc = document.createElement("option");
+        loc.value = "local"; loc.textContent = cur + " (" + (currencyNames[cur] || cur) + ")";
+        select.appendChild(loc);
+    }
+    if (previous === "local" && cur !== "USD") select.value = "local";
+}
 
 function calculateGoal() {
+    const pKey = $("goalPlatform").value, cKey = $("goalCountry").value;
+    const goal = Number($("incomeGoal").value);
+    if (!goal || goal <= 0) { alert("Please enter a valid income goal."); return; }
 
-    const selectedPlatform = goalPlatform.value;
-    const selectedCountry = goalCountry.value;
-    const goal = Number(incomeGoal.value);
+    const cur = curOf(cKey);
+    const goalUSD = $("goalMode").value === "local" ? goal / (rates[cur] || 1) : goal;
+    const rate = rpmRates[pKey];
+    const avgRPM = ((rate.min + rate.max) / 2) * countries[cKey].m;
+    const viewsNeeded = Math.ceil((goalUSD / avgRPM) * 1000);
 
-    if (!goal || goal <= 0) {
-        alert("Please enter a valid income goal.");
-        return;
-    }
+    $("requiredViews").textContent = num(viewsNeeded);
+    $("perDayViews").textContent = "About " + num(viewsNeeded / 30) + " views per day";
+    $("goalDescription").textContent =
+        "To reach about " + fmtUSD(goalUSD) +
+        (cur !== "USD" ? " (" + fmtCur(toLocal(goalUSD, cur), cur) + ")" : "") +
+        " per month on " + platformNames[pKey] + " with a " + countries[cKey].n +
+        " audience, you may need around " + num(viewsNeeded) + " monthly views.";
 
-    const rate = rpmRates[selectedPlatform];
-    const multiplier = countryMultipliers[selectedCountry];
-
-    const averageRPM = ((rate.min + rate.max) / 2) * multiplier;
-    const viewsNeeded = (goal / averageRPM) * 1000;
-
-    requiredViews.textContent = Math.ceil(viewsNeeded).toLocaleString();
-
-    goalDescription.textContent =
-        "To reach approximately " +
-        formatUSD(goal) +
-        " per month on " +
-        platformNames[selectedPlatform] +
-        ", you may need around " +
-        Math.ceil(viewsNeeded).toLocaleString() +
-        " monthly views.";
-
-    goalResult.classList.remove("hidden");
-
-    goalResult.scrollIntoView({ behavior: "smooth", block: "center" });
+    $("goalResult").classList.remove("hidden");
+    $("goalResult").scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
-goalButton.addEventListener("click", calculateGoal);
-
-incomeGoal.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-        calculateGoal();
-    }
-});
-
-
-/* PLATFORM COMPARISON */
+/* ---------- PLATFORM COMPARISON ---------- */
 
 function comparePlatforms() {
+    const views = Number($("comparisonViews").value);
+    if (!views || views <= 0) { if (document.activeElement === $("compareButton")) alert("Please enter a valid number of views."); return; }
 
-    const viewAmount = Number(comparisonViews.value);
+    const cKey = $("comparisonCountry").value, cur = curOf(cKey);
+    const body = $("comparisonBody");
+    body.innerHTML = "";
 
-    if (!viewAmount || viewAmount <= 0) {
-        alert("Please enter a valid number of views.");
-        return;
-    }
+    const keys = Object.keys(rpmRates);
+    const maxHigh = Math.max.apply(null, keys.map(function (k) { return calcRange(k, cKey, views).high; }));
 
-    const multiplier = countryMultipliers[comparisonCountry.value];
-
-    comparisonBody.innerHTML = "";
-
-    Object.keys(rpmRates).forEach(function (platformKey) {
-
-        const rate = rpmRates[platformKey];
-
-        const low = (viewAmount / 1000) * rate.min * multiplier;
-        const high = (viewAmount / 1000) * rate.max * multiplier;
-
+    keys.forEach(function (k) {
+        const r = calcRange(k, cKey, views);
         const row = document.createElement("tr");
 
-        const nameCell = document.createElement("td");
-        const lowCell = document.createElement("td");
-        const highCell = document.createElement("td");
+        const name = document.createElement("td");
+        name.textContent = platformNames[k];
+        const bar = document.createElement("div"); bar.className = "bar";
+        const fill = document.createElement("span"); fill.style.width = Math.max(3, r.high / maxHigh * 100) + "%";
+        bar.appendChild(fill); name.appendChild(bar);
 
-        nameCell.textContent = platformNames[platformKey];
-        lowCell.textContent = formatUSD(low);
-        highCell.textContent = formatUSD(high);
+        const low = document.createElement("td"); low.textContent = fmtUSD(r.low);
+        const high = document.createElement("td"); high.textContent = fmtUSD(r.high);
+        const avg = document.createElement("td");
+        avg.textContent = cur !== "USD" ? fmtCur(toLocal(r.avg, cur), cur) : fmtUSD(r.avg);
 
-        row.appendChild(nameCell);
-        row.appendChild(lowCell);
-        row.appendChild(highCell);
-
-        comparisonBody.appendChild(row);
+        row.appendChild(name); row.appendChild(low); row.appendChild(high); row.appendChild(avg);
+        body.appendChild(row);
     });
+
+    $("avgHeader").textContent = "Average (" + cur + ")";
 }
 
-compareButton.addEventListener("click", comparePlatforms);
+/* ---------- 12-MONTH GROWTH PROJECTOR ---------- */
 
-comparisonViews.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-        comparePlatforms();
+function projectGrowth() {
+    const pKey = $("projPlatform").value, cKey = $("projCountry").value;
+    const start = Number($("projViews").value), growth = Number($("projGrowth").value);
+
+    if (!start || start <= 0) { alert("Please enter your current monthly views."); return; }
+    if (isNaN(growth) || growth < 0 || growth > 100) { alert("Monthly growth must be between 0 and 100 percent."); return; }
+
+    const cur = curOf(cKey), body = $("projBody");
+    body.innerHTML = "";
+    let total = 0;
+
+    for (let month = 1; month <= 12; month++) {
+        const views = start * Math.pow(1 + growth / 100, month - 1);
+        const earn = calcRange(pKey, cKey, views).avg;
+        total += earn;
+
+        const row = document.createElement("tr");
+        [("Month " + month), num(views), fmtUSD(earn), cur !== "USD" ? fmtCur(toLocal(earn, cur), cur) : "-"].forEach(function (t) {
+            const td = document.createElement("td"); td.textContent = t; row.appendChild(td);
+        });
+        body.appendChild(row);
     }
-});
 
+    $("projTotal").textContent = "12-month total: " + fmtUSD(total) +
+        (cur !== "USD" ? " (about " + fmtCur(toLocal(total, cur), cur) + ")" : "");
+    $("projResult").classList.remove("hidden");
+    $("projResult").scrollIntoView({ behavior: "smooth", block: "center" });
+}
 
-/* HISTORY */
+/* ---------- HISTORY ---------- */
 
 function getHistory() {
-
-    const saved = storageGet("creatorCalcHistory");
-
-    if (!saved) {
-        return [];
-    }
-
-    try {
-        const parsed = JSON.parse(saved);
-        return Array.isArray(parsed) ? parsed : [];
-    } catch (error) {
-        return [];
-    }
+    try { const parsed = JSON.parse(storageGet("creatorCalcHistory")); return Array.isArray(parsed) ? parsed : []; }
+    catch (e) { return []; }
 }
 
-function saveCalculation(platformKey, countryKey, viewAmount, low, high) {
-
+function saveCalculation(c) {
     const history = getHistory();
-
-    history.unshift({
-        platform: platformKey,
-        country: countryKey,
-        views: viewAmount,
-        low: low,
-        high: high,
-        date: new Date().toLocaleString()
-    });
-
-    if (history.length > 10) {
-        history.pop();
-    }
-
+    history.unshift({ platform: c.platform, country: c.country, views: c.views, low: c.low, high: c.high, date: new Date().toLocaleString() });
+    if (history.length > 10) history.pop();
     storageSet("creatorCalcHistory", JSON.stringify(history));
 }
 
 function displayHistory() {
-
-    const history = getHistory();
-
-    historyContainer.innerHTML = "";
-
-    if (history.length === 0) {
-
-        const empty = document.createElement("p");
-        empty.className = "empty-history";
-        empty.textContent = "No calculations yet.";
-        historyContainer.appendChild(empty);
-
-        return;
+    const box = $("historyContainer"), history = getHistory();
+    box.innerHTML = "";
+    if (!history.length) {
+        const p = document.createElement("p"); p.className = "empty-history"; p.textContent = "No calculations yet.";
+        box.appendChild(p); return;
     }
-
     history.forEach(function (item) {
-
-        const box = document.createElement("div");
-        box.className = "history-item";
-
-        const platformName = document.createElement("div");
-        platformName.className = "history-platform";
-        platformName.textContent = platformNames[item.platform] || item.platform;
-
-        const viewsText = document.createElement("div");
-        viewsText.textContent = Number(item.views).toLocaleString() + " monthly views";
-
-        const earningsText = document.createElement("div");
-        earningsText.textContent = formatUSD(item.low) + " - " + formatUSD(item.high);
-
-        const dateText = document.createElement("div");
-        dateText.className = "history-date";
-        dateText.textContent = item.date;
-
-        box.appendChild(platformName);
-        box.appendChild(viewsText);
-        box.appendChild(earningsText);
-        box.appendChild(dateText);
-
-        historyContainer.appendChild(box);
+        const div = document.createElement("div"); div.className = "history-item";
+        const a = document.createElement("div"); a.className = "history-platform";
+        a.textContent = (platformNames[item.platform] || item.platform) + " - " + (countries[item.country] ? countries[item.country].n : "");
+        const b = document.createElement("div"); b.textContent = num(item.views) + " monthly views";
+        const c = document.createElement("div"); c.textContent = fmtUSD(item.low) + " - " + fmtUSD(item.high);
+        const d = document.createElement("div"); d.className = "history-date"; d.textContent = item.date;
+        [a, b, c, d].forEach(function (el) { div.appendChild(el); });
+        box.appendChild(div);
     });
 }
 
-clearHistory.addEventListener("click", function () {
-    storageRemove("creatorCalcHistory");
-    displayHistory();
-});
+/* ---------- EVENTS ---------- */
 
+function onEnter(el, fn) { el.addEventListener("keydown", function (e) { if (e.key === "Enter") fn(); }); }
 
-/* DARK / LIGHT MODE */
+fillCountries();
+updateGoalModes();
 
-function loadTheme() {
+$("calculateButton").addEventListener("click", function () { calculateEarnings(false); });
+onEnter($("views"), function () { calculateEarnings(false); });
+$("copyButton").addEventListener("click", copyResult);
+$("shareButton").addEventListener("click", shareResult);
 
-    if (storageGet("creatorCalcTheme") === "light") {
-        document.body.classList.add("light-mode");
-        themeButton.textContent = "☀️";
-    } else {
-        themeButton.textContent = "🌙";
-    }
-}
+$("goalCountry").addEventListener("change", updateGoalModes);
+$("goalButton").addEventListener("click", calculateGoal);
+onEnter($("incomeGoal"), calculateGoal);
 
-function toggleTheme() {
+$("compareButton").addEventListener("click", comparePlatforms);
+$("comparisonCountry").addEventListener("change", comparePlatforms);
+onEnter($("comparisonViews"), comparePlatforms);
 
-    document.body.classList.toggle("light-mode");
+$("projButton").addEventListener("click", projectGrowth);
+onEnter($("projViews"), projectGrowth);
 
-    const isLight = document.body.classList.contains("light-mode");
+$("clearHistory").addEventListener("click", function () { storageRemove("creatorCalcHistory"); displayHistory(); });
 
-    storageSet("creatorCalcTheme", isLight ? "light" : "dark");
-    themeButton.textContent = isLight ? "☀️" : "🌙";
-}
-
-themeButton.addEventListener("click", toggleTheme);
-
-
-/* STARTUP */
-
-loadTheme();
 displayHistory();
 comparePlatforms();
+loadRates();
