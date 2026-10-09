@@ -1,269 +1,252 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="CreatorCalc estimates earnings from YouTube, TikTok, Instagram, Facebook and websites.">
-    <meta name="google-adsense-account" content="ca-pub-2466036868085670">
-    <meta name="google-site-verification" content="C_t1NXdOevw_b1gwuYkl1E1QWD1WBhZJ2ZzNXrZbAiY">
-    <meta name="theme-color" content="#0f172a">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Estimate creator earnings from YouTube, TikTok, Instagram, Facebook, and website traffic with CreatorCalc.">
 
-    <title>CreatorCalc - Creator Earnings Calculator</title>
+  <meta name="google-adsense-account" content="ca-pub-2466036868085670">
+  <meta name="google-site-verification" content="C_t1NXdOevw_b1gwuYkl1E1QWD1WBhZJ2ZzNXrZbAiY">
 
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2466036868085670"
-        crossorigin="anonymous"></script>
+  <title>CreatorCalc — Creator Earnings Calculator</title>
 
-    <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2466036868085670"
+    crossorigin="anonymous"></script>
 </head>
-
 <body>
-    <!-- HEADER -->
-    <header class="header">
-        <div class="container header-content">
-            <div class="logo">Creator<span>Calc</span></div>
-            <button id="themeButton" class="theme-button" aria-label="Toggle theme">🌙</button>
-        </div>
-    </header>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="./" aria-label="CreatorCalc home">Creator<span>Calc</span></a>
 
-    <!-- HERO -->
+      <nav aria-label="Main navigation">
+        <a href="#calculator">Calculator</a>
+        <a href="#goal">Income goal</a>
+        <a href="#comparison">Compare</a>
+        <a href="#projection">Projection</a>
+      </nav>
+
+      <button id="themeButton" type="button" aria-label="Toggle color theme">
+        Toggle theme
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
     <section class="hero">
-        <div class="container">
-            <h1>How Much Can You Earn From Your Views?</h1>
-            <p>Estimate your potential creator earnings from YouTube, TikTok, Instagram, Facebook and websites.</p>
-            <a href="#calculator" class="start-button">Start Calculating</a>
-        </div>
+      <p class="eyebrow">CREATOR TOOLS</p>
+      <h1>Estimate your creator earnings</h1>
+      <p>Explore estimated earnings from views across popular platforms. Results are estimates, not guaranteed payments.</p>
     </section>
 
-    <main class="container">
-        <!-- CALCULATOR -->
-        <section id="calculator" class="calculator-section">
-            <div class="section-title">
-                <h2>💰 Earnings Calculator</h2>
-                <p>Enter your monthly views to get an estimated range.</p>
-            </div>
+    <!-- MAIN EARNINGS CALCULATOR -->
+    <section id="calculator" class="panel">
+      <h2>Earnings calculator</h2>
 
-            <div class="calculator-card">
-                <div class="form-group">
-                    <label for="platform">Platform</label>
-                    <select id="platform">
-                        <option value="youtube">YouTube</option>
-                        <option value="tiktok">TikTok</option>
-                        <option value="instagram">Instagram</option>
-                        <option value="facebook">Facebook</option>
-                        <option value="website">Website</option>
-                    </select>
-                </div>
+      <div class="form-grid">
+        <label for="platform">Platform
+          <select id="platform">
+            <option value="youtube">YouTube</option>
+            <option value="tiktok">TikTok</option>
+            <option value="instagram">Instagram</option>
+            <option value="facebook">Facebook</option>
+            <option value="website">Website / blog</option>
+          </select>
+        </label>
 
-                <div class="form-group">
-                    <label for="country">Country</label>
-                    <select id="country">
-                        <option value="tz">Tanzania</option>
-                        <option value="ke">Kenya</option>
-                        <option value="ug">Uganda</option>
-                        <option value="ng">Nigeria</option>
-                        <option value="gh">Ghana</option>
-                        <option value="za">South Africa</option>
-                        <option value="us">United States</option>
-                        <option value="uk">United Kingdom</option>
-                        <option value="ca">Canada</option>
-                        <option value="au">Australia</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
+        <label for="country">Audience country
+          <select id="country"></select>
+        </label>
 
-                <div class="form-group">
-                    <label for="views">Monthly Views</label>
-                    <input type="number" id="views" placeholder="Example: 100000" min="0">
-                </div>
+        <label for="views">Views per day
+          <input id="views" type="number" min="0" step="1" value="1000" inputmode="numeric">
+        </label>
+      </div>
 
-                <button id="calculateButton" class="calculate-button">Calculate Earnings</button>
-            </div>
+      <button id="calculateButton" type="button">Calculate earnings</button>
 
-            <div id="result" class="result-card hidden">
-                <h2>Your Estimated Earnings</h2>
+      <div id="result" class="result-area" aria-live="polite">
+        <h3>Estimated earnings</h3>
+        <p id="resultDescription">Enter your daily views and calculate an estimate.</p>
 
-                <div class="main-earning">
-                    <span id="earnings">$0.00</span>
-                    <small>USD / month</small>
-                </div>
+        <div class="earnings-grid">
+          <div>
+            <span>Daily (USD)</span>
+            <strong id="dailyEarnings">$0.00</strong>
+            <small id="dailyLocal"></small>
+          </div>
 
-                <div class="tsh-earning">
-                    <span id="tshEarnings">TSh 0</span>
-                    <small>Tanzanian Shillings / month</small>
-                </div>
+          <div>
+            <span>Monthly (USD)</span>
+            <strong id="monthlyEarnings">$0.00</strong>
+            <small id="monthlyLocal"></small>
+          </div>
 
-                <div class="earning-grid">
-                    <div class="earning-box">
-                        <span>Daily</span>
-                        <strong id="dailyEarnings">$0.00</strong>
-                    </div>
-                    <div class="earning-box">
-                        <span>Monthly</span>
-                        <strong id="monthlyEarnings">$0.00</strong>
-                    </div>
-                    <div class="earning-box">
-                        <span>Yearly</span>
-                        <strong id="yearlyEarnings">$0.00</strong>
-                    </div>
-                </div>
-
-                <p id="resultDescription" class="result-description"></p>
-
-                <div class="result-buttons">
-                    <button id="copyButton" class="secondary-button">📋 Copy Result</button>
-                    <button id="shareButton" class="secondary-button">📤 Share</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- GOAL CALCULATOR -->
-        <section class="goal-section">
-            <div class="section-title">
-                <h2>🎯 Income Goal Calculator</h2>
-                <p>Find out approximately how many views you need.</p>
-            </div>
-
-            <div class="calculator-card">
-                <div class="form-group">
-                    <label for="goalPlatform">Platform</label>
-                    <select id="goalPlatform">
-                        <option value="youtube">YouTube</option>
-                        <option value="tiktok">TikTok</option>
-                        <option value="instagram">Instagram</option>
-                        <option value="facebook">Facebook</option>
-                        <option value="website">Website</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="goalCountry">Country</label>
-                    <select id="goalCountry">
-                        <option value="tz">Tanzania</option>
-                        <option value="ke">Kenya</option>
-                        <option value="ug">Uganda</option>
-                        <option value="ng">Nigeria</option>
-                        <option value="gh">Ghana</option>
-                        <option value="za">South Africa</option>
-                        <option value="us">United States</option>
-                        <option value="uk">United Kingdom</option>
-                        <option value="ca">Canada</option>
-                        <option value="au">Australia</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="incomeGoal">Monthly Income Goal (USD)</label>
-                    <input type="number" id="incomeGoal" placeholder="Example: 1000" min="0">
-                </div>
-
-                <button id="goalButton" class="calculate-button">Calculate Required Views</button>
-            </div>
-
-            <div id="goalResult" class="result-card hidden">
-                <h2>Views Required</h2>
-
-                <div class="main-earning">
-                    <span id="requiredViews">0</span>
-                    <small>estimated monthly views</small>
-                </div>
-
-                <p id="goalDescription" class="result-description"></p>
-            </div>
-        </section>
-
-        <!-- COMPARISON -->
-        <section class="comparison-section">
-            <div class="section-title">
-                <h2>📊 Platform Comparison</h2>
-                <p>Compare estimated earnings for the same number of views.</p>
-            </div>
-
-            <div class="comparison-card">
-                <div class="form-group">
-                    <label for="comparisonCountry">Country</label>
-                    <select id="comparisonCountry">
-                        <option value="tz">Tanzania</option>
-                        <option value="ke">Kenya</option>
-                        <option value="ug">Uganda</option>
-                        <option value="ng">Nigeria</option>
-                        <option value="gh">Ghana</option>
-                        <option value="za">South Africa</option>
-                        <option value="us">United States</option>
-                        <option value="uk">United Kingdom</option>
-                        <option value="ca">Canada</option>
-                        <option value="au">Australia</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="comparisonViews">Monthly Views</label>
-                    <input type="number" id="comparisonViews" value="100000" min="0">
-                </div>
-
-                <button id="compareButton" class="calculate-button">Compare Platforms</button>
-
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Platform</th>
-                                <th>Low Estimate</th>
-                                <th>High Estimate</th>
-                            </tr>
-                        </thead>
-                        <tbody id="comparisonBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- HISTORY -->
-        <section class="history-section">
-            <div class="section-title">
-                <h2>📋 Calculation History</h2>
-                <p>Your previous calculations are stored on this device.</p>
-            </div>
-
-            <div class="history-card">
-                <div id="historyContainer">
-                    <p class="empty-history">No calculations yet.</p>
-                </div>
-
-                <button id="clearHistory" class="clear-button">Clear History</button>
-            </div>
-        </section>
-
-        <!-- FAQ -->
-        <section class="faq-section">
-            <div class="section-title">
-                <h2>❓ Frequently Asked Questions</h2>
-            </div>
-
-            <div class="faq-card">
-                <h3>Are these earnings guaranteed?</h3>
-                <p>No. Creator earnings vary depending on platform, audience location, content type, advertising demand, monetization eligibility and other factors.</p>
-
-                <h3>What does RPM mean?</h3>
-                <p>RPM means the estimated revenue earned per 1,000 views.</p>
-
-                <h3>Why can earnings differ between countries?</h3>
-                <p>Advertising rates and monetization conditions can vary significantly between countries and audiences.</p>
-            </div>
-        </section>
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="footer">
-        <div class="container">
-            <h2>CreatorCalc</h2>
-            <p>Estimate. Compare. Create.</p>
-            <p class="disclaimer">CreatorCalc provides estimates for informational purposes only. Actual earnings may be significantly different.</p>
-            <p class="copyright">© 2026 CreatorCalc. All rights reserved. POWERED BY NAIAD inc</p>
+          <div>
+            <span>Yearly (USD)</span>
+            <strong id="yearlyEarnings">$0.00</strong>
+            <small id="yearlyLocal"></small>
+          </div>
         </div>
-    </footer>
 
-    <script src="script.js"></script>
+        <div id="localBox">
+          <span id="localLabel">Local-currency estimate</span>
+          <strong id="localEarnings">—</strong>
+        </div>
+
+        <p id="rpmInfo" class="muted"></p>
+
+        <div class="button-row">
+          <button id="copyButton" type="button">Copy result</button>
+          <button id="shareButton" type="button">Share result</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- INCOME GOAL CALCULATOR -->
+    <section id="goal" class="panel">
+      <h2>Views needed for your income goal</h2>
+      <p>Estimate how many daily views could be needed to reach a daily, monthly, or yearly earnings target.</p>
+
+      <div class="form-grid">
+        <label for="goalMode">Goal period
+          <select id="goalMode">
+            <option value="monthly">Monthly</option>
+            <option value="daily">Daily</option>
+            <option value="yearly">Yearly</option>
+          </select>
+        </label>
+
+        <label for="goalPlatform">Platform
+          <select id="goalPlatform">
+            <option value="youtube">YouTube</option>
+            <option value="tiktok">TikTok</option>
+            <option value="instagram">Instagram</option>
+            <option value="facebook">Facebook</option>
+            <option value="website">Website / blog</option>
+          </select>
+        </label>
+
+        <label for="goalCountry">Audience country
+          <select id="goalCountry"></select>
+        </label>
+
+        <label for="incomeGoal">Income goal (USD)
+          <input id="incomeGoal" type="number" min="0.01" step="0.01" value="100">
+        </label>
+      </div>
+
+      <button id="goalButton" type="button">Calculate required views</button>
+
+      <div id="goalResult" aria-live="polite">
+        <p id="goalDescription">Choose a target and calculate the approximate views needed.</p>
+        <strong id="requiredViews">—</strong>
+        <p id="perDayViews"></p>
+      </div>
+    </section>
+
+    <!-- PLATFORM COMPARISON -->
+    <section id="comparison" class="panel">
+      <h2>Compare platforms</h2>
+
+      <div class="form-grid">
+        <label for="comparisonCountry">Audience country
+          <select id="comparisonCountry"></select>
+        </label>
+
+        <label for="comparisonViews">Views per day
+          <input id="comparisonViews" type="number" min="0" step="1" value="1000">
+        </label>
+      </div>
+
+      <button id="compareButton" type="button">Compare earnings</button>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Platform</th>
+              <th scope="col">Low estimate / month</th>
+              <th scope="col">High estimate / month</th>
+              <th id="avgHeader" scope="col">Average / month</th>
+            </tr>
+          </thead>
+          <tbody id="comparisonBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- GROWTH PROJECTION -->
+    <section id="projection" class="panel">
+      <h2>12-month growth projection</h2>
+      <p>Project a possible monthly earnings trend if views grow at a steady rate. This is a scenario, not a prediction.</p>
+
+      <div class="form-grid">
+        <label for="projPlatform">Platform
+          <select id="projPlatform">
+            <option value="youtube">YouTube</option>
+            <option value="tiktok">TikTok</option>
+            <option value="instagram">Instagram</option>
+            <option value="facebook">Facebook</option>
+            <option value="website">Website / blog</option>
+          </select>
+        </label>
+
+        <label for="projCountry">Audience country
+          <select id="projCountry"></select>
+        </label>
+
+        <label for="projViews">Starting daily views
+          <input id="projViews" type="number" min="0" step="1" value="1000">
+        </label>
+
+        <label for="projGrowth">Monthly view growth (%)
+          <input id="projGrowth" type="number" min="-99" max="500" step="1" value="10">
+        </label>
+      </div>
+
+      <button id="projButton" type="button">Create projection</button>
+      <p id="projResult" aria-live="polite"></p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Month</th>
+              <th scope="col">Daily views (approx.)</th>
+              <th scope="col">Estimated monthly earnings</th>
+            </tr>
+          </thead>
+          <tbody id="projBody"></tbody>
+        </table>
+      </div>
+
+      <p>Total estimated earnings across 12 months: <strong id="projTotal">$0.00</strong></p>
+    </section>
+
+    <!-- CALCULATION HISTORY -->
+    <section id="history" class="panel">
+      <h2>Recent calculations</h2>
+      <div id="historyContainer">
+        <p class="muted">Your recent calculations will appear here on this device.</p>
+      </div>
+      <button id="clearHistory" type="button">Clear history</button>
+    </section>
+
+    <section class="panel note">
+      <h2>Important note</h2>
+      <p>CreatorCalc provides rough estimates using assumed RPM ranges and country adjustments. Actual earnings depend on monetization eligibility, audience location, content type, advertiser demand, platform rules, and other factors. Views alone do not guarantee payment.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© <span id="currentYear"></span> CreatorCalc. For estimation and educational purposes only.</p>
+      <p><a href="mailto:Inertiadev71@gmail.com">Contact</a></p>
+    </div>
+  </footer>
+
+  <script src="script.js" defer></script>
 </body>
 </html>
